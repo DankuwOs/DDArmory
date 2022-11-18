@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{41542D7D-76FA-43F5-AB88-0990B6C764DF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DDArmory</RootNamespace>
+    <AssemblyName>DDArmory</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CustomWeaponBase">
+      <HintPath>..\..\Custom Weapon Base\Builds\CustomWeaponBase.dll</HintPath>
+    </Reference>
+    <Reference Include="ModLoader">
+      <HintPath>..\..\..\..\ModLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="Patches\Patch_Health_Damage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Weapons\ADAPS\HPEquipADAPS.cs" />
+    <Compile Include="Weapons\ALFAS\HPEquipGPSMissile.cs" />
+    <Compile Include="Weapons\CJSM\AirToAirClusterMissile.cs" />
+    <Compile Include="Weapons\FAB9000\BiggingMissile.cs" />
+    <Compile Include="Weapons\Floaties\FloatySync.cs" />
+    <Compile Include="Weapons\Floaties\HPEquipFloaty.cs" />
+    <Compile Include="Weapons\Floaties\HPEquipFloatyGunTurret.cs" />
+    <Compile Include="Weapons\Guidance\Anime_Guidance.cs" />
+    <Compile Include="Weapons\Guidance\imtargetedlmao.cs" />
+    <Compile Include="Weapons\Guidance\JAARMGuidance.cs" />
+    <Compile Include="Weapons\Guidance\LoiterGuidance.cs" />
+    <Compile Include="Weapons\JAARM\HPEquipJAARM.cs" />
+    <Compile Include="Weapons\JAARM\RadarMissile.cs" />
+    <Compile Include="Weapons\LaserWings\GetTeam.cs" />
+    <Compile Include="Weapons\LaserWings\HPEquipLaserWings.cs" />
+    <Compile Include="Weapons\LaserWings\WingsSync.cs" />
+    <Compile Include="Weapons\LaserWings\WingsTouch.cs" />
+    <Compile Include="Weapons\MDS\HPEquipMDS.cs" />
+    <Compile Include="Weapons\SatelliteGun\GrabInteractable.cs" />
+    <Compile Include="Weapons\SatelliteGun\HPEquipSG.cs" />
+    <Compile Include="Weapons\SatelliteGun\HPEquipSGHandHeld.cs" />
+    <Compile Include="Weapons\SatelliteGun\SGSync.cs" />
+    <Compile Include="Weapons\Soakie\ArmorRelocation.cs" />
+    <Compile Include="Weapons\Soakie\HPEquipSoakieSystem.cs" />
+    <Compile Include="Weapons\Soakie\HPEquipSoakieSystemMulticrew.cs" />
+    <Compile Include="Weapons\Soakie\SoakieSystemSync.cs" />
+    <Compile Include="Weapons\Utils\DebugLinesManager.cs" />
+    <Compile Include="Weapons\XPGM\DDRocketLauncher.cs" />
+    <Compile Include="Weapons\XPGM\DD_FlechetteAirburstRocket.cs" />
+    <Compile Include="Weapons\XPGM\HPEquipHeadTrackOML.cs" />
+    <Compile Include="Weapons\XPGM\OmlAimPoint.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
