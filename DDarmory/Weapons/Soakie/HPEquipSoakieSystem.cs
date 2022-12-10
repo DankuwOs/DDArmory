@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DDArmory;
 using UnityEngine;
 using Random = System.Random;
 
@@ -23,37 +22,48 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 					hitbox.subtractiveArmor += additionalSubtractiveArmor;
 				}
 			}
+
+			
+
 			SetTransforms();
 		}
 	}
 
-	public virtual void SetTransforms()
+	public void SetTransforms()
 	{
 		Debug.Log("Setting up transforms for '" + shortName + "'");
-		Debug.Log(string.Format("'{0}'", setTransforms));
-		foreach (ArmorRelocation armorRelocation in setTransforms)
+
+		for (int i = 0; i < armorTfs.Length; i++)
 		{
-			string[] array = armorRelocation.path.Split('/');
-			bool flag = array.Length == 0;
-			if (flag)
+			var armorTf = armorTfs[i];
+			var path = paths[i];
+			var localPosition = localPositions[i];
+			var localRotation = localRotations[i];
+			
+			string[] array = path.Split('/');
+			if (!(array.Length > 0))
 			{
 				break;
 			}
+			
 			Transform transform = weaponManager.transform;
+			
 			foreach (string n in array)
 			{
-				bool flag2 = transform == null;
-				if (flag2)
+				if (!transform)
 				{
 					return;
 				}
+				
 				transform = transform.Find(n);
 			}
-			Transform armorTf = armorRelocation.armorTf;
+			
 			CustomWeaponsBase.instance.AddObject(armorTf.gameObject);
 			armorTf.SetParent(transform);
-			armorTf.localPosition = armorRelocation.localPosition;
-			armorTf.localRotation = Quaternion.Euler(armorRelocation.localRotation);
+			armorTf.localPosition = localPosition;
+			armorTf.localRotation = Quaternion.Euler(localRotation);
+			if (localScales.Length > 0)
+				armorTf.localScale = localScales[i];
 		}
 	}
 
@@ -63,12 +73,9 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 		{
 			float num = powerDraw * _brightness * Time.deltaTime;
 			_battery.Drain(num);
-			bool flag2 = _battery.currentCharge < num;
-			if (flag2)
-			{
-				_brightness = 0f;
-			}
-			_brightness = Mathf.Clamp(_brightness, minBrightness, maxBrightness);
+			bool sufficientCharge = _battery.currentCharge > num  && _battery.connected;
+			
+			_brightness = Mathf.Clamp(sufficientCharge? _brightness : 0f, minBrightness, maxBrightness);
 		}
 	}
 
@@ -127,8 +134,17 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 
 	private Dictionary<Hitbox, float> hitboxes = new Dictionary<Hitbox, float>();
 
-	[SerializeReference]
-	public List<ArmorRelocation> setTransforms;
+	public Transform[] armorTfs;
+
+	[Tooltip("Positon / Rotation relative to the targeted tf.")]
+	public Vector3[] localPositions;
+
+	public Vector3[] localRotations;
+
+	public Vector3[] localScales;
+
+	[Tooltip("Path to the transform in the aircraft prefab.")]
+	public string[] paths;
 
 	public Renderer internalMesh;
 

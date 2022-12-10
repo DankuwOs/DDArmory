@@ -7,7 +7,7 @@ public class DD_FlechetteAirburstRocket : Rocket
 	{
 		if (!flechetteGun.actor)
 		{
-			flechetteGun.actor = this.sourceActor;
+			flechetteGun.actor = sourceActor;
 		}
 	}
 
@@ -19,7 +19,7 @@ public class DD_FlechetteAirburstRocket : Rocket
 
 	private IEnumerator FiredRoutine()
 	{
-		flechetteGun.actor = this.sourceActor;
+		flechetteGun.actor = sourceActor;
 		while (true)
 		{
 			RaycastHit raycastHit;

@@ -7,34 +7,33 @@ public class HPEquipADAPS : HPEquipMissileLauncher, IMassObject
 {
 	public override int GetCount()
 	{
-		return this.launchers.Sum((MissileLauncher missileLauncher) => missileLauncher.hardpoints.Length);
+		return launchers.Sum((MissileLauncher missileLauncher) => missileLauncher.hardpoints.Length);
 	}
 
 	private void FixedUpdate()
 	{
-		if (isEquipped)
+		if (!isEquipped) return;
+		
+		_time += Time.deltaTime;
+		if (_time >= detectionRate)
 		{
-			this._time += Time.deltaTime;
-			if (this._time >= this.detectionRate)
+			_time = 0f;
+			StartCoroutine(Targeting());
+		}
+
+		if (detectedActors.Count <= 0) return;
+		
+		foreach (Actor actor in detectedActors.Keys.ToList<Actor>())
+		{
+			if (!actor || detectedActors[actor] <= 0f)
 			{
-				this._time = 0f;
-				base.StartCoroutine(this.Targeting());
+				detectedActors.Remove(actor);
 			}
-			if (this.detectedActors.Count > 0)
+			else
 			{
-				foreach (Actor actor in this.detectedActors.Keys.ToList<Actor>())
-				{
-					if (!actor || this.detectedActors[actor] <= 0f)
-					{
-						this.detectedActors.Remove(actor);
-					}
-					else
-					{
-						Dictionary<Actor, float> dictionary = this.detectedActors;
-						Actor key = actor;
-						dictionary[key] -= Time.deltaTime;
-					}
-				}
+				Dictionary<Actor, float> dictionary = detectedActors;
+				Actor key = actor;
+				dictionary[key] -= Time.deltaTime;
 			}
 		}
 	}
@@ -47,33 +46,33 @@ public class HPEquipADAPS : HPEquipMissileLauncher, IMassObject
 			yield break;
 		}
 		List<Actor> tgts = new List<Actor>();
-		TargetManager.instance.GetAllOpticalTargetsInView(base.weaponManager.actor, this.fov, 0f, this.range, Actor.GetRoleMask(new Actor.Roles[]
+		TargetManager.instance.GetAllOpticalTargetsInView(weaponManager.actor, fov, 0f, range, Actor.GetRoleMask(new Actor.Roles[]
 		{
-			this.roleMask
-		}), this.ml.transform.position, this.ml.transform.forward, tgts, false, false);
+			roleMask
+		}), ml.transform.position, ml.transform.forward, tgts, false, false);
 		if (tgts.Count == 0)
 		{
 			yield break;
 		}
-		tgts.Sort((Actor a, Actor b) => (a.position - this.ml.transform.position).sqrMagnitude.CompareTo((b.position - this.ml.transform.position).sqrMagnitude));
+		tgts.Sort((Actor a, Actor b) => (a.position - ml.transform.position).sqrMagnitude.CompareTo((b.position - ml.transform.position).sqrMagnitude));
 		
-		foreach (Actor actor in from e in tgts where !this.detectedActors.ContainsKey(e) select e)
+		foreach (Actor actor in from e in tgts where !detectedActors.ContainsKey(e) select e)
 		{
-			this.detectedActors.Add(actor, this.forgetTimer);
-			Missile missile = this.ml.GetNextMissile();
+			detectedActors.Add(actor, forgetTimer);
+			Missile missile = ml.GetNextMissile();
 			missile.SetOpticalTarget(actor.transform, actor, null);
-			this.ml.FireMissile();
-			yield return new WaitForSeconds(this.timeBetweenFire);
+			ml.FireMissile();
+			yield return new WaitForSeconds(timeBetweenFire);
 		}
 		yield break;
 	}
 
 	public float GetMass()
 	{
-		return this.weight + (from t in this.launchers
+		return weight + (from t in launchers
 		let missile = t.GetNextMissile()
 		where missile
-		select missile.mass * (float)t.missileCount).Sum();
+		select missile.mass * t.missileCount).Sum();
 	}
 
 	[Header("ADAPS")]

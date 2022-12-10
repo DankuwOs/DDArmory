@@ -14,7 +14,7 @@ public class WingsTouch : MonoBehaviour
 		if (!flag)
 		{
 			Ray ray = new Ray(_rayOrigin.position, _rayOrigin.forward);
-			RaycastHit[] array = Physics.SphereCastAll(ray, radius, maxDist);
+			RaycastHit[] array = Physics.SphereCastAll(ray, radius, maxDist, layerMask: LayerMask.GetMask("Hitbox"));
 			if (array.Length > 0)
 			{
 				foreach (RaycastHit raycastHit in array)

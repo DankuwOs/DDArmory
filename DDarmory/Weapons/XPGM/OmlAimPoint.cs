@@ -17,7 +17,7 @@ public class OmlAimPoint : OpticalMissileLauncher
 		else
 		{
 			Traverse traverse = Traverse.Create(this);
-			while (this.weaponEnabled && !htOml._tgt && htOml._headTracking)
+			while (weaponEnabled && !htOml._tgt && htOml._headTracking)
 			{
 				Vector3 vector = fwdObj.transform.forward * 1000f;
 				traverse.Field("fwdLocalAimPos").SetValue(vector);

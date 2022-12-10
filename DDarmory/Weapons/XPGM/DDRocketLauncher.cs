@@ -48,8 +48,6 @@ public class DDRocketLauncher : RocketLauncher
 			yield return null;
 
 		}
-
-		yield break;
 	}
 	
 	[Header("Rotary Options")]

@@ -1,36 +1,30 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VTOLVR.Multiplayer;
 
-// Token: 0x0200000F RID: 15
 public class RadarMissile : Missile
 {
-	// Token: 0x06000045 RID: 69 RVA: 0x000037F4 File Offset: 0x000019F4
+	[Header("JAARM")]
+	public Radar Radar;
+	
 	public override void Fire()
 	{
 		base.Fire();
-		bool flag = !Radar;
-		if (!flag)
+		
+		if (!Radar) return;
+		
+		Radar.radarEnabled = true;
+		Radar.myActor = this.actor;
+		Radar.OnDetectedActor += delegate(Actor detectedActor)
 		{
-			Radar.radarEnabled = true;
-			Radar.myActor = this.actor;
-			this.actor.role = Actor.Roles.Air;
-			Radar.OnDetectedActor += delegate(Actor detectedActor)
+			detectedActor.DetectActor(actor.team, actor); // Don't know what this does so bye bye
+
+			if (VTOLMPUtils.IsMultiplayer())
 			{
-				List<Actor> list = (this.actor.team == Teams.Allied) ? TargetManager.instance.alliedUnits : TargetManager.instance.enemyUnits;
-				foreach (Actor actor in list)
-				{
-					bool flag2 = !actor.weaponManager || !actor.weaponManager.tsc;
-					if (flag2)
-					{
-						break;
-					}
-					actor.weaponManager.tsc.DataLinkedRadarDetected(detectedActor);
-				}
-			};
-		}
+				VTOLMPDataLinkManager.instance.ReportKnownPosition(detectedActor, actor.team);
+			}
+		};
 	}
 
-	// Token: 0x04000059 RID: 89
-	[Header("JAARM")]
-	public Radar Radar;
+	
 }
