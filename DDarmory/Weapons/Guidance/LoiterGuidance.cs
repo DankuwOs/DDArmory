@@ -1,11 +1,8 @@
 ﻿using DDArmory.Guidance;
 using UnityEngine;
 using UnityEngine.Events;
-
-// Token: 0x0200000D RID: 13
 public class LoiterGuidance : MissileGuidanceUnit
 {
-	// Token: 0x0600003F RID: 63 RVA: 0x0000347C File Offset: 0x0000167C
 	public override Vector3 GetGuidedPoint()
 	{
 		Actor opticalTargetFromView = TargetManager.instance.GetOpticalTargetFromView(missile.actor, visualRange, Actor.GetRoleMask(roleMask), 300f, eyeTf.position, eyeTf.forward, fov);

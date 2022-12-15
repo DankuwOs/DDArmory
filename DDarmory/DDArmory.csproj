@@ -8,8 +8,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>DDArmory</RootNamespace>
     <AssemblyName>DDArmory</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,9 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,9 +46,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="CustomWeaponBase">
       <HintPath>..\..\Custom Weapon Base\Builds\CustomWeaponBase.dll</HintPath>
@@ -115,6 +116,11 @@
     <Compile Include="Weapons\Soakie\HPEquipSoakieSystemCRT.cs" />
     <Compile Include="Weapons\Soakie\HPEquipSoakieSystemMulticrew.cs" />
     <Compile Include="Weapons\Soakie\SoakieSystemSync.cs" />
+    <Compile Include="Weapons\Swing Wing\Display Components\SweepBar.cs" />
+    <Compile Include="Weapons\Swing Wing\Display Components\SweepDisplay.cs" />
+    <Compile Include="Weapons\Swing Wing\Display Components\SweepMode.cs" />
+    <Compile Include="Weapons\Swing Wing\HPEquipSwingWing.cs" />
+    <Compile Include="Weapons\Swing Wing\SwingWingController.cs" />
     <Compile Include="Weapons\ThrustReverser\HPEquipThrustReverser.cs" />
     <Compile Include="Weapons\Utils\DebugLinesManager.cs" />
     <Compile Include="Weapons\XPGM\DDRocketLauncher.cs" />

@@ -26,7 +26,6 @@ public class Patch_ModuleEngine
             if (animTime <= 0.05f)
                 return;
 
-                
             var moduleEngineTraverse = Traverse.Create(__instance);
             
             moduleEngineTraverse.Property("finalThrust").SetValue(__instance.finalThrust * reverser.reverserCurve.Evaluate(animTime));

@@ -27,7 +27,7 @@ public class HPEquipFloaty : HPEquippable, IMassObject
 
 	private void FixedUpdate()
 	{
-		if (_deployed || alwaysDeployed)
+		if ((_deployed || alwaysDeployed) && _vehicleInputManager)
 		{
 			Steer(_vehicleInputManager.outputPYR);
 			Traverse traverse = Traverse.Create(_vehicleInputManager);
@@ -137,12 +137,23 @@ public class HPEquipFloaty : HPEquippable, IMassObject
 		{
 			GameObject gameObject = _wheelsController.gearAnimator.GetComponentInParent<TireRollAudio>().gameObject;
 			gameObject.SetActive(false);
+
+			var landingGearLever = weaponManager.GetComponentInChildren<LandingGearLever>();
+			if (landingGearLever)
+			{
+				landingGearLever.gear = new [] { animator };
+			}
+			
 			animator.battery = _wheelsController.gearAnimator.battery;
 			animator.statusLight = _wheelsController.gearAnimator.statusLight;
 			animator.dragComponent.rb = _wheelsController.gearAnimator.dragComponent.rb;
 			_wheelsController.gearAnimator = animator;
 			_wheelsController.suspensions = suspensions;
 			_wheelsController.steeringTransform = steerTf;
+
+			_wheelsController.leftBrakeIdx = leftBrakeIdx;
+			_wheelsController.rightBrakeIdx = RightBrakeIdx;
+			
 			_flightInfo.suspensions = suspensions;
 		}
 	}
@@ -164,10 +175,10 @@ public class HPEquipFloaty : HPEquippable, IMassObject
 	[Header("Floatie")]
 	public bool alwaysDeployed;
 
-	[Range(0f, 1f)]
+	[Range(0f, 0.3f)]
 	public float maxBrakeForce;
 
-	[Range(0f, 1f)]
+	[Range(0f, 0.1f)]
 	public float steeringForce;
 
 	[Range(0f, 0.01f)]
@@ -201,6 +212,12 @@ public class HPEquipFloaty : HPEquippable, IMassObject
 	public GameObject landingLightParent;
 
 	public Transform steerTf;
+
+	[Tooltip("0 Based Index Index of Left Brake")]
+	public int leftBrakeIdx = 3;
+
+	[Tooltip("0 Based Index Index of Right Brake")]
+	public int RightBrakeIdx = 1;
 
 	private bool _deployed;
 

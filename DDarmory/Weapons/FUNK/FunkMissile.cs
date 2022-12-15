@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
-#pragma warning disable CS4014
 
 public class FunkMissile : MonoBehaviour
 {
