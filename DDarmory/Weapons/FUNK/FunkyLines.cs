@@ -7,21 +7,17 @@ public class FunkyLines : MonoBehaviour
     [Tooltip("Damage per fixedupdate tick")]
     public float damage = 20f;
 
-    [HideInInspector]
-    public bool positionsSet;
+    [HideInInspector] public bool positionsSet;
 
     [HideInInspector] public Vector3 pos;
 
     [HideInInspector] public Actor tgt;
 
     [HideInInspector] public Actor myActor;
-    
+
     private void Update()
     {
-        if (!positionsSet)
-        {
-            return;
-        }
+        if (!positionsSet) return;
         lineRenderer.SetPositions(new[]
         {
             pos,
@@ -30,16 +26,12 @@ public class FunkyLines : MonoBehaviour
     }
 
     private int _i;
-    
+
     private void FixedUpdate()
     {
         _i++;
-        if (!positionsSet || _i <= 5)
-        {
-            
-            return;
-        }
-        
+        if (!positionsSet || _i <= 5) return;
+
         if (!tgt.alive)
             Destroy(gameObject, 3f);
         _i = 0;

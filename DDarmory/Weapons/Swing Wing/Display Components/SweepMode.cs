@@ -10,9 +10,9 @@
 
         public Transform modeTf;
     
-        public Color albedoColor;
+        [ColorUsage(false, true)] public Color albedoColor;
     
-        public Color emissiveColor;
+        [ColorUsage(false, true)] public Color emissiveColor;
 
         public float lerpSpeed = 1f;
 

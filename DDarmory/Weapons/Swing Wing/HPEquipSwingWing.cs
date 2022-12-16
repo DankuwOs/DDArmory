@@ -2,6 +2,7 @@
 using System.Linq;
 using Harmony;
 using UnityEngine;
+using VTOLVR.Multiplayer;
 
 [RequireComponent(typeof(SwingWingController))]
 public class HPEquipSwingWing : HPEquippable, IMassObject
@@ -32,22 +33,24 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
     {
         base.OnEquip();
 
-        Debug.Log($"[HPEquipSwingWing]: OnEquip");
-        
         Initialize();
     }
 
     public override void OnConfigAttach(LoadoutConfigurator configurator)
     {
         base.OnConfigAttach(configurator);
-
-        Initialize(configurator);
+        
+        if (!VTOLMPUtils.IsMultiplayer())
+            Initialize(configurator);
     }
 
     public override void OnConfigDetach(LoadoutConfigurator configurator)
     {
         base.OnConfigDetach(configurator);
 
+        if (!VTOLMPUtils.IsMultiplayer())
+            Initialize(configurator);
+        
         foreach (var disableObject in disableObjects)
         {
             ToggleObject(disableObject, true);
@@ -66,6 +69,27 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
         var vesselVehiclePart = _weaponManager.GetComponent<VehiclePart>();
         var aeroController = _weaponManager.GetComponent<AeroController>();
 
+        // Old objects are still present in lists and cause nullrefs, this fixes that while also adding our own objects.
+        if (VTOLMPUtils.IsMultiplayer())
+        {
+            var playerVehicleNetSync = _weaponManager.GetComponent<PlayerVehicleNetSync>();
+            if (playerVehicleNetSync)
+            {
+                var list = _weaponManager.GetComponentsInChildren<VehiclePart>();
+
+                playerVehicleNetSync.vehicleParts = list;
+            }
+            
+            var damageSync = _weaponManager.GetComponent<DamageSync>();
+            if (damageSync)
+            {
+                var list = _weaponManager.GetComponentsInChildren<Health>();
+
+                damageSync.healths = list;
+            }
+        }
+
+        // Assign parent to the vehicle parts for reasons
         if (vesselVehiclePart)
             foreach (var vehiclePart in GetComponentsInChildren<VehiclePart>())
             {
@@ -73,13 +97,13 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
                     vehiclePart.parent = vesselVehiclePart;
             }
         
-        Debug.Log($"[HPEquipSwingWing]: AeroController? = {aeroController}");
-        Debug.Log($"[HPEquipSwingWing]: AC Length = {aeroController.controlSurfaces.Length}");
+        
         if (aeroController)
         {
+            // Adding my own control surfaces to the existing ones.
+            
             for (int i = 0; i < controlSurfaces.Length; i++)
             {
-                Debug.Log($"[HPEquipSwingWing]: Doing control surface {i}");
                 var controlSurfaceTransform = controlSurfaces[i];
 
                 if (!controlSurfaceTransform.transform)
@@ -89,20 +113,24 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
                 {
                     aeroController.controlSurfaces[i] = controlSurfaceTransform;
                     
-                    aeroController.controlSurfaces[i].Init();
+                    aeroController.controlSurfaces[i].Init(); // Need to init every time you change a control surface
                     continue;
                 }
-
-                Debug.Log($"[HPEquipSwingWing]: Adding new surface {i}");
-
+                
+                // Add extra surfaces
+                
                 var controllerList = aeroController.controlSurfaces.ToList(); // Simply adding it doesn't work :~(
                 controllerList.Add(controlSurfaceTransform);
                 aeroController.controlSurfaces = controllerList.ToArray();
                 
                 aeroController.controlSurfaces[i].Init();
             }
+
+            
+            controller.aeroController = aeroController;
         }
 
+        // Moving hardpoints to my own
         for (var index = 0; index < hardpoints.Length; index++)
         {
             var hardpoint = hardpoints[index];
@@ -115,6 +143,7 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
             }
         }
 
+        // Detaching hardpoints that no longer exist
         foreach (var i in detachHpIdx)
         {
             if (configurator)
@@ -125,19 +154,20 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
                 _weaponManager.JettisonEq(i);
         }
         
-        
+        // Toggling existing wings off
         foreach (var disableObject in disableObjects)
         {
             ToggleObject(disableObject);
         }
-
-        foreach (var componentsInChild in GetComponentsInChildren<Wing>())
+        
+        
+        foreach (var wing in GetComponentsInChildren<Wing>(true))
         {
-            componentsInChild.rb = _weaponManager.vesselRB;
+            wing.rb = _weaponManager.vesselRB;
+            wing.enabled = true;
         }
 
-        controller.SetPivotImmediate(defaultSweep);
-
+        // Setting manual | auto mode
         if (manualByDefault)
         {
             controller.display.manualObj.SetVisibility(false);
@@ -155,11 +185,28 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
 
         if (flightInfo)
             controller.flightInfo = flightInfo;
+        
+        
+        // Set up wing vapor
+        foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>())
+        {
+            wingVaporParticles.flightInfo = flightInfo;
+        }
+        
+        
+        // Set up nav / strobe / formation lights
+        controller.battery = _weaponManager.battery;
+        controller.SetupLights();
 
+        if (_weaponManager.battery)
+            controller.toggle.battery = _weaponManager.battery;
+        
         var sweepLever = GetComponentInChildren<VRThrottle>();
         
         if (sweepLever)
             sweepLever.RemoteSetThrottle(1 - defaultSweep);
+        
+        controller.SetPivotImmediate(defaultSweep);
     }
 
     public void ToggleObject(string path, bool enable = false)

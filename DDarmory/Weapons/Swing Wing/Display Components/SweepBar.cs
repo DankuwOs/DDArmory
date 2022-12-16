@@ -6,10 +6,10 @@
         public Vector3 axis;
 
         public Transform bar;
+
+        [ColorUsage(false, true)] public Color albedoColor;
     
-        public Color albedoColor;
-    
-        public Color emissiveColor;
+        [ColorUsage(false, true)] public Color emissiveColor;
     
         public void SetScale(float scale) => bar.localScale = (Vector3.one - axis * Mathf.Clamp01(scale));
     }

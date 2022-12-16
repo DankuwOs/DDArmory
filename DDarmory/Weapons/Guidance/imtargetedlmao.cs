@@ -2,7 +2,7 @@
 
 namespace DDArmory.Guidance
 {
-	public class imtargetedlmao : MonoBehaviour
-	{
-	}
+    public class imtargetedlmao : MonoBehaviour
+    {
+    }
 }

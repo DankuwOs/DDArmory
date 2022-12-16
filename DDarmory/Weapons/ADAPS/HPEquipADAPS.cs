@@ -5,94 +5,88 @@ using UnityEngine;
 
 public class HPEquipADAPS : HPEquipMissileLauncher, IMassObject
 {
-	public override int GetCount()
-	{
-		return launchers.Sum((MissileLauncher missileLauncher) => missileLauncher.hardpoints.Length);
-	}
+    public override int GetCount()
+    {
+        return launchers.Sum((MissileLauncher missileLauncher) => missileLauncher.hardpoints.Length);
+    }
 
-	private void FixedUpdate()
-	{
-		if (!isEquipped) return;
-		
-		_time += Time.deltaTime;
-		if (_time >= detectionRate)
-		{
-			_time = 0f;
-			StartCoroutine(Targeting());
-		}
+    private void FixedUpdate()
+    {
+        if (!isEquipped) return;
 
-		if (detectedActors.Count <= 0) return;
-		
-		foreach (Actor actor in detectedActors.Keys.ToList<Actor>())
-		{
-			if (!actor || detectedActors[actor] <= 0f)
-			{
-				detectedActors.Remove(actor);
-			}
-			else
-			{
-				Dictionary<Actor, float> dictionary = detectedActors;
-				Actor key = actor;
-				dictionary[key] -= Time.deltaTime;
-			}
-		}
-	}
+        _time += Time.deltaTime;
+        if (_time >= detectionRate)
+        {
+            _time = 0f;
+            StartCoroutine(Targeting());
+        }
 
-	private IEnumerator Targeting()
-	{
-		
-		if (ml.missileCount == 0)
-		{
-			yield break;
-		}
-		List<Actor> tgts = new List<Actor>();
-		TargetManager.instance.GetAllOpticalTargetsInView(weaponManager.actor, fov, 0f, range, Actor.GetRoleMask(new Actor.Roles[]
-		{
-			roleMask
-		}), ml.transform.position, ml.transform.forward, tgts, false, false);
-		if (tgts.Count == 0)
-		{
-			yield break;
-		}
-		tgts.Sort((Actor a, Actor b) => (a.position - ml.transform.position).sqrMagnitude.CompareTo((b.position - ml.transform.position).sqrMagnitude));
-		
-		foreach (Actor actor in from e in tgts where !detectedActors.ContainsKey(e) select e)
-		{
-			detectedActors.Add(actor, forgetTimer);
-			Missile missile = ml.GetNextMissile();
-			missile.SetOpticalTarget(actor.transform, actor, null);
-			ml.FireMissile();
-			yield return new WaitForSeconds(timeBetweenFire);
-		}
-		yield break;
-	}
+        if (detectedActors.Count <= 0) return;
 
-	public float GetMass()
-	{
-		return weight + (from t in launchers
-		let missile = t.GetNextMissile()
-		where missile
-		select missile.mass * t.missileCount).Sum();
-	}
+        foreach (var actor in detectedActors.Keys.ToList<Actor>())
+            if (!actor || detectedActors[actor] <= 0f)
+            {
+                detectedActors.Remove(actor);
+            }
+            else
+            {
+                var dictionary = detectedActors;
+                var key = actor;
+                dictionary[key] -= Time.deltaTime;
+            }
+    }
 
-	[Header("ADAPS")]
-	public MissileLauncher[] launchers;
+    private IEnumerator Targeting()
+    {
+        if (ml.missileCount == 0) yield break;
+        var tgts = new List<Actor>();
+        TargetManager.instance.GetAllOpticalTargetsInView(weaponManager.actor, fov, 0f, range, Actor.GetRoleMask(
+            new Actor.Roles[]
+            {
+                roleMask
+            }), ml.transform.position, ml.transform.forward, tgts, false, false);
+        if (tgts.Count == 0) yield break;
+        tgts.Sort((Actor a, Actor b) =>
+            (a.position - ml.transform.position).sqrMagnitude.CompareTo((b.position - ml.transform.position)
+                .sqrMagnitude));
 
-	public Actor.Roles roleMask;
+        foreach (var actor in from e in tgts where !detectedActors.ContainsKey(e) select e)
+        {
+            detectedActors.Add(actor, forgetTimer);
+            var missile = ml.GetNextMissile();
+            missile.SetOpticalTarget(actor.transform, actor, null);
+            ml.FireMissile();
+            yield return new WaitForSeconds(timeBetweenFire);
+        }
 
-	public float range = 2000f;
+        yield break;
+    }
 
-	public float fov = 60f;
+    public float GetMass()
+    {
+        return weight + (from t in launchers
+            let missile = t.GetNextMissile()
+            where missile
+            select missile.mass * t.missileCount).Sum();
+    }
 
-	public float detectionRate = 0.25f;
+    [Header("ADAPS")] public MissileLauncher[] launchers;
 
-	public float timeBetweenFire = 0.3f;
+    public Actor.Roles roleMask;
 
-	public float forgetTimer = 3f;
+    public float range = 2000f;
 
-	public float weight;
+    public float fov = 60f;
 
-	private Dictionary<Actor, float> detectedActors = new Dictionary<Actor, float>();
+    public float detectionRate = 0.25f;
 
-	private float _time;
+    public float timeBetweenFire = 0.3f;
+
+    public float forgetTimer = 3f;
+
+    public float weight;
+
+    private Dictionary<Actor, float> detectedActors = new();
+
+    private float _time;
 }

@@ -4,228 +4,199 @@ using UnityEngine.Events;
 
 public class HPEquipFloaty : HPEquippable, IMassObject
 {
-	protected override void OnEquip()
-	{
-		base.OnEquip();
-		GrabComponents();
-	}
+    protected override void OnEquip()
+    {
+        base.OnEquip();
+        GrabComponents();
+    }
 
-	public void GrabComponents()
-	{
-		if (weaponManager)
-		{
-			_vehicleInputManager = weaponManager.GetComponent<VehicleInputManager>();
-			_flightInfo = weaponManager.actor.flightInfo;
-		}
-		Debug.Log(string.Format("{0} | {1} | {2}", weaponManager.gameObject, _flightInfo, _vehicleInputManager));
-		SetDrag(waterBuoyancies, baseDrag);
-		if (usingWheels)
-		{
-			StartWheels();
-		}
-	}
+    public void GrabComponents()
+    {
+        if (weaponManager)
+        {
+            _vehicleInputManager = weaponManager.GetComponent<VehicleInputManager>();
+            _flightInfo = weaponManager.actor.flightInfo;
+        }
 
-	private void FixedUpdate()
-	{
-		if ((_deployed || alwaysDeployed) && _vehicleInputManager)
-		{
-			Steer(_vehicleInputManager.outputPYR);
-			Traverse traverse = Traverse.Create(_vehicleInputManager);
-			if (_vehicleInputManager.wheelBrakesBound)
-			{
-				float value = traverse.Field("hardwareBrakeL").GetValue<float>();
-				float value2 = traverse.Field("hardwareBrakeR").GetValue<float>();
-				SetBrakes((value + value2) / 2f);
-			}
-			else
-			{
-				float value3 = traverse.Field("virtualBrakes").GetValue<float>();
-				SetBrakes(value3);
-			}
-		}
-	}
+        Debug.Log(string.Format("{0} | {1} | {2}", weaponManager.gameObject, _flightInfo, _vehicleInputManager));
+        SetDrag(waterBuoyancies, baseDrag);
+        if (usingWheels) StartWheels();
+    }
 
-	public void Steer(Vector3 input)
-	{
-		float num = input.y;
-		if (Mathf.Abs(num) < 0.2f)
-		{
-			SetDrag(waterBuoyancies, baseDrag);
-		}
-		else
-		{
-			num = (Mathf.Abs(num) - 0.2f) * 1.2f;
-			float drag = steerForceCurve.Evaluate(num) * steeringForce;
-			if (num >= 0f)
-			{
-				SetDrag(steerRight, drag);
-			}
-			else
-			{
-				SetDrag(steerLeft, drag);
-			}
-		}
-	}
+    private void FixedUpdate()
+    {
+        if ((_deployed || alwaysDeployed) && _vehicleInputManager)
+        {
+            Steer(_vehicleInputManager.outputPYR);
+            var traverse = Traverse.Create(_vehicleInputManager);
+            if (_vehicleInputManager.wheelBrakesBound)
+            {
+                var value = traverse.Field("hardwareBrakeL").GetValue<float>();
+                var value2 = traverse.Field("hardwareBrakeR").GetValue<float>();
+                SetBrakes((value + value2) / 2f);
+            }
+            else
+            {
+                var value3 = traverse.Field("virtualBrakes").GetValue<float>();
+                SetBrakes(value3);
+            }
+        }
+    }
 
-	public void SetBrakes(float input)
-	{
-		if (input != 0f)
-		{
-			if (input < 0.05f)
-			{
-				SetDrag(brakeBuoyancies, baseDrag);
-				return;
-			}
-		}
-		SetDrag(brakeBuoyancies, brakeForceCurve.Evaluate(input) * maxBrakeForce);
-	}
-	
-	public void SetDrag(WaterBuoyancy[] list, float drag)
-	{
-		foreach (WaterBuoyancy waterBuoyancy in list)
-		{
-			waterBuoyancy.drag = drag;
-		}
-	}
+    public void Steer(Vector3 input)
+    {
+        var num = input.y;
+        if (Mathf.Abs(num) < 0.2f)
+        {
+            SetDrag(waterBuoyancies, baseDrag);
+        }
+        else
+        {
+            num = (Mathf.Abs(num) - 0.2f) * 1.2f;
+            var drag = steerForceCurve.Evaluate(num) * steeringForce;
+            if (num >= 0f)
+                SetDrag(steerRight, drag);
+            else
+                SetDrag(steerLeft, drag);
+        }
+    }
 
-	public void ToggleDeploy()
-	{
-		if (!_deployed)
-		{
-			Deploy();
-		}
-		else
-		{
-			Retract();
-		}
-	}
+    public void SetBrakes(float input)
+    {
+        if (input != 0f)
+            if (input < 0.05f)
+            {
+                SetDrag(brakeBuoyancies, baseDrag);
+                return;
+            }
 
-	public void Deploy()
-	{
-		_deployed = true;
-		UnityEvent onDeploy = OnDeploy;
-		bool flag = onDeploy != null;
-		if (flag)
-		{
-			onDeploy.Invoke();
-		}
-	}
+        SetDrag(brakeBuoyancies, brakeForceCurve.Evaluate(input) * maxBrakeForce);
+    }
 
-	public void Retract()
-	{
-		_deployed = false;
-		UnityEvent onRetract = OnRetract;
-		bool flag = onRetract != null;
-		if (flag)
-		{
-			onRetract.Invoke();
-		}
-	}
+    public void SetDrag(WaterBuoyancy[] list, float drag)
+    {
+        foreach (var waterBuoyancy in list) waterBuoyancy.drag = drag;
+    }
 
-	public void StartWheels()
-	{
-		if (weaponManager)
-		{
-			_wheelsController = weaponManager.GetComponent<WheelsController>();
-			weaponManager.transform.Find("LightSwitches").Find("LandingLight").GetComponent<ObjectPowerUnit>().objectToPower = landingLightParent;
-		}
-		if (!_wheelsController)
-		{
-			Debug.Log("FLTY: No wheels controller!");
-		}
-		else
-		{
-			GameObject gameObject = _wheelsController.gearAnimator.GetComponentInParent<TireRollAudio>().gameObject;
-			gameObject.SetActive(false);
+    public void ToggleDeploy()
+    {
+        if (!_deployed)
+            Deploy();
+        else
+            Retract();
+    }
 
-			var landingGearLever = weaponManager.GetComponentInChildren<LandingGearLever>();
-			if (landingGearLever)
-			{
-				landingGearLever.gear = new [] { animator };
-			}
-			
-			animator.battery = _wheelsController.gearAnimator.battery;
-			animator.statusLight = _wheelsController.gearAnimator.statusLight;
-			animator.dragComponent.rb = _wheelsController.gearAnimator.dragComponent.rb;
-			_wheelsController.gearAnimator = animator;
-			_wheelsController.suspensions = suspensions;
-			_wheelsController.steeringTransform = steerTf;
+    public void Deploy()
+    {
+        _deployed = true;
+        var onDeploy = OnDeploy;
+        var flag = onDeploy != null;
+        if (flag) onDeploy.Invoke();
+    }
 
-			_wheelsController.leftBrakeIdx = leftBrakeIdx;
-			_wheelsController.rightBrakeIdx = RightBrakeIdx;
-			
-			_flightInfo.suspensions = suspensions;
-		}
-	}
+    public void Retract()
+    {
+        _deployed = false;
+        var onRetract = OnRetract;
+        var flag = onRetract != null;
+        if (flag) onRetract.Invoke();
+    }
 
-	public float GetMass()
-	{
-		return mass;
-	}
+    public void StartWheels()
+    {
+        if (weaponManager)
+        {
+            _wheelsController = weaponManager.GetComponent<WheelsController>();
+            weaponManager.transform.Find("LightSwitches").Find("LandingLight").GetComponent<ObjectPowerUnit>()
+                .objectToPower = landingLightParent;
+        }
 
-	private void OnDrawGizmos()
-	{
-		Gizmos.color = gizmoColor;
-		foreach (WaterBuoyancy waterBuoyancy in waterBuoyancies)
-		{
-			Gizmos.DrawSphere(waterBuoyancy.transform.position, 0.3f);
-		}
-	}
+        if (!_wheelsController)
+        {
+            Debug.Log("FLTY: No wheels controller!");
+        }
+        else
+        {
+            var gameObject = _wheelsController.gearAnimator.GetComponentInParent<TireRollAudio>().gameObject;
+            gameObject.SetActive(false);
 
-	[Header("Floatie")]
-	public bool alwaysDeployed;
+            var landingGearLever = weaponManager.GetComponentInChildren<LandingGearLever>();
+            if (landingGearLever) landingGearLever.gear = new[] { animator };
 
-	[Range(0f, 0.3f)]
-	public float maxBrakeForce;
+            animator.battery = _wheelsController.gearAnimator.battery;
+            animator.statusLight = _wheelsController.gearAnimator.statusLight;
+            animator.dragComponent.rb = _wheelsController.gearAnimator.dragComponent.rb;
+            _wheelsController.gearAnimator = animator;
+            _wheelsController.suspensions = suspensions;
+            _wheelsController.steeringTransform = steerTf;
 
-	[Range(0f, 0.1f)]
-	public float steeringForce;
+            _wheelsController.leftBrakeIdx = leftBrakeIdx;
+            _wheelsController.rightBrakeIdx = RightBrakeIdx;
 
-	[Range(0f, 0.01f)]
-	public float baseDrag;
+            _flightInfo.suspensions = suspensions;
+        }
+    }
 
-	public WaterBuoyancy[] waterBuoyancies;
+    public float GetMass()
+    {
+        return mass;
+    }
 
-	public WaterBuoyancy[] steerRight;
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = gizmoColor;
+        foreach (var waterBuoyancy in waterBuoyancies) Gizmos.DrawSphere(waterBuoyancy.transform.position, 0.3f);
+    }
 
-	public WaterBuoyancy[] steerLeft;
+    [Header("Floatie")] public bool alwaysDeployed;
 
-	public WaterBuoyancy[] brakeBuoyancies;
+    [Range(0f, 0.3f)] public float maxBrakeForce;
 
-	public AnimationCurve steerForceCurve;
+    [Range(0f, 0.1f)] public float steeringForce;
 
-	public AnimationCurve brakeForceCurve;
+    [Range(0f, 0.01f)] public float baseDrag;
 
-	public UnityEvent OnDeploy;
+    public WaterBuoyancy[] waterBuoyancies;
 
-	public UnityEvent OnRetract;
+    public WaterBuoyancy[] steerRight;
 
-	public float mass;
+    public WaterBuoyancy[] steerLeft;
 
-	[Header("Wheels")]
-	public bool usingWheels;
+    public WaterBuoyancy[] brakeBuoyancies;
 
-	public GearAnimator animator;
+    public AnimationCurve steerForceCurve;
 
-	public RaySpringDamper[] suspensions;
+    public AnimationCurve brakeForceCurve;
 
-	public GameObject landingLightParent;
+    public UnityEvent OnDeploy;
 
-	public Transform steerTf;
+    public UnityEvent OnRetract;
 
-	[Tooltip("0 Based Index Index of Left Brake")]
-	public int leftBrakeIdx = 3;
+    public float mass;
 
-	[Tooltip("0 Based Index Index of Right Brake")]
-	public int RightBrakeIdx = 1;
+    [Header("Wheels")] public bool usingWheels;
 
-	private bool _deployed;
+    public GearAnimator animator;
 
-	private VehicleInputManager _vehicleInputManager;
+    public RaySpringDamper[] suspensions;
 
-	private WheelsController _wheelsController;
+    public GameObject landingLightParent;
 
-	private FlightInfo _flightInfo;
+    public Transform steerTf;
 
-	public Color gizmoColor = new Color(0f, 0f, 255f, 0.4f);
+    [Tooltip("0 Based Index Index of Left Brake")]
+    public int leftBrakeIdx = 3;
+
+    [Tooltip("0 Based Index Index of Right Brake")]
+    public int RightBrakeIdx = 1;
+
+    private bool _deployed;
+
+    private VehicleInputManager _vehicleInputManager;
+
+    private WheelsController _wheelsController;
+
+    private FlightInfo _flightInfo;
+
+    public Color gizmoColor = new(0f, 0f, 255f, 0.4f);
 }
