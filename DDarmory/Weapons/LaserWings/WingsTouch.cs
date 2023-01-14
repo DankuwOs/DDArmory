@@ -11,25 +11,25 @@ public class WingsTouch : MonoBehaviour
 	{
 		if (doDamage && _actor.alive)
 		{
-			Ray ray = new Ray(_rayOrigin.position, _rayOrigin.forward);
-			RaycastHit[] array = Physics.SphereCastAll(ray, radius, maxDist, layerMask: LayerMask.GetMask("Hitbox"));
+			var ray = new Ray(_rayOrigin.position, _rayOrigin.forward);
+			var array = Physics.SphereCastAll(ray, radius, maxDist, layerMask: LayerMask.GetMask("Hitbox"));
 			if (array.Length <= 0) return;
 			
-			foreach (RaycastHit raycastHit in array)
+			foreach (var raycastHit in array)
 			{
-				Hitbox component = raycastHit.collider.GetComponent<Hitbox>();
+				var component = raycastHit.collider.GetComponent<Hitbox>();
 				
 				if (!component) continue;
 				
-				Health health = component.health;
-				bool flag4 = health == null;
+				var health = component.health;
+				var flag4 = health == null;
 				if (flag4)
 				{
 					break;
 				}
-				float distance = raycastHit.distance;
-				float num = damage * curve.Evaluate(distance / maxDist);
-				bool flag5 = num < health.minDamage;
+				var distance = raycastHit.distance;
+				var num = damage * curve.Evaluate(distance / maxDist);
+				var flag5 = num < health.minDamage;
 				if (!flag5)
 				{
 					health.Damage(num, health.transform.position, Health.DamageTypes.Impact, _actor);

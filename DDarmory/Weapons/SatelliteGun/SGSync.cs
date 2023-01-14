@@ -48,12 +48,12 @@ public class SGSync : VTNetSyncRPCOnly
 	[VTRPC]
 	public void RPC_SGShouldFire(int deploy)
 	{
-		bool flag = deploy == 1;
-		bool flag2 = !isMine;
+		var flag = deploy == 1;
+		var flag2 = !isMine;
 		if (flag2)
 		{
 			_satellite.MoveSol(_satellite.transform.position);
-			bool flag3 = flag;
+			var flag3 = flag;
 			if (flag3)
 			{
 				_satellite.OnStartFire();

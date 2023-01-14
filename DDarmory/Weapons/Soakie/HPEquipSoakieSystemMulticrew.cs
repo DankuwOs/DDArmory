@@ -7,7 +7,7 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 {
 	protected override void OnEquip()
 	{
-		bool flag = !weaponManager;
+		var flag = !weaponManager;
 		if (!flag)
 		{
 			_battery = weaponManager.battery;
@@ -15,8 +15,8 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 			select renderer.materials[0]).ToArray();
 			_colorBrightness = _materials[0].GetFloat(colorBrightnessProp);
 			_depthBrightness = _materials[0].GetFloat(depthBrightnessProp);
-			Hitbox[] componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
-			foreach (Hitbox hitbox in componentsInChildren)
+			var componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
+			foreach (var hitbox in componentsInChildren)
 			{
 				_hitBoxes.Add(hitbox, hitbox.subtractiveArmor);
 				hitbox.subtractiveArmor += additionalSubtractiveArmor;
@@ -29,7 +29,7 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 	{
 		Debug.Log("Setting up transforms for '" + shortName + "'");
 
-		for (int i = 0; i < armorTfs.Length; i++)
+		for (var i = 0; i < armorTfs.Length; i++)
 		{
 			var armorTf = armorTfs[i];
 			var path = paths[i];
@@ -37,15 +37,15 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 			var localRotation = localRotations[i];
 			
 			
-			string[] array = path.Split('/');
+			var array = path.Split('/');
 			if (!(array.Length > 0))
 			{
 				break;
 			}
 			
-			Transform transform = weaponManager.transform;
+			var transform = weaponManager.transform;
 			
-			foreach (string n in array)
+			foreach (var n in array)
 			{
 				if (!transform)
 				{
@@ -66,12 +66,12 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 
 	public void Update()
 	{
-		bool flag = !isEquipped;
+		var flag = !isEquipped;
 		if (!flag)
 		{
-			float num = powerDraw * _colorBrightness + _depthBrightness * Time.deltaTime;
+			var num = powerDraw * _colorBrightness + _depthBrightness * Time.deltaTime;
 			_battery.Drain(num);
-			bool sufficientCharge = _battery.currentCharge > num  && _battery.connected;
+			var sufficientCharge = _battery.currentCharge > num  && _battery.connected;
 			
 			_colorBrightness = Mathf.Clamp(sufficientCharge? _colorBrightness : 0f, minBrightness, maxBrightness);
 			_depthBrightness = Mathf.Clamp(sufficientCharge? _depthBrightness : 0f, minBrightness, maxBrightness);
@@ -81,7 +81,7 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 
 	public void SetMaterialValues()
 	{
-		foreach (Material material in _materials)
+		foreach (var material in _materials)
 		{
 			material.SetFloat(colorBrightnessProp, _colorBrightness);
 			material.SetFloat(depthBrightnessProp, _depthBrightness);
@@ -103,13 +103,13 @@ public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 	public void OnDamage(Hitbox hb, float damage)
 	{
 		damage = Mathf.Abs(damage);
-		bool flag = !hb;
+		var flag = !hb;
 		if (!flag)
 		{
 			float num;
 			_hitBoxes.TryGetValue(hb, out num);
-			float num2 = hb.subtractiveArmor - damage;
-			bool flag2 = num2 < num;
+			var num2 = hb.subtractiveArmor - damage;
+			var flag2 = num2 < num;
 			if (flag2)
 			{
 				hb.subtractiveArmor = num;

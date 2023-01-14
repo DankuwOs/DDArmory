@@ -8,8 +8,8 @@ public class HPEquipHeadTrackOML : HPEquipOpticalML
 	protected override void OnEquip()
 	{
 		oml = (OpticalMissileLauncher)ml;
-		VRJoystick[] joysticks = weaponManager.GetComponent<VehicleControlManifest>().joysticks;
-		foreach (VRJoystick vrjoystick in joysticks)
+		var joysticks = weaponManager.GetComponent<VehicleControlManifest>().joysticks;
+		foreach (var vrjoystick in joysticks)
 		{
 			vrjoystick.OnThumbstickButtonDown.AddListener(delegate
 			{
@@ -39,7 +39,7 @@ public class HPEquipHeadTrackOML : HPEquipOpticalML
 		if(!itemActivated || !visualTargetFinder || visualTargetFinder.targetsSeen.Count == 0 || !_firing || !_headTracking || !weaponManager.opticalTargeter.powered || _tgt)
 			return;
 		
-			IOrderedEnumerable<Actor> source = from a in visualTargetFinder.targetsSeen
+			var source = from a in visualTargetFinder.targetsSeen
 			orderby Vector3.Distance(visualTargetFinder.fovReference.position, a.position)
 			select a;
 			_tgt = source.First();

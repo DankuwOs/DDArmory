@@ -9,10 +9,10 @@ public class HPEquipSG : HPEquipGun, IMassObject
 		base.OnEquip();
 		_windingWeapon = GetComponent<WindingWeapon>();
 		_targeter = weaponManager.opticalTargeter;
-		foreach (ParticleSystem particleSystem in systems)
+		foreach (var particleSystem in systems)
 		{
-			ParticleSystem.MinMaxCurve minMaxCurve = particleSystem.main.startSpeed;
-			bool flag = Math.Abs(minMaxCurve.constant - startSpeed) > 3f;
+			var minMaxCurve = particleSystem.main.startSpeed;
+			var flag = Math.Abs(minMaxCurve.constant - startSpeed) > 3f;
 			if (flag)
 			{
 				minMaxCurve.constant = startSpeed;
@@ -46,7 +46,7 @@ public class HPEquipSG : HPEquipGun, IMassObject
 			Vector3 vector;
 			if (targeter.lockedActor)
 			{
-				Actor lockedActor = targeter.lockedActor;
+				var lockedActor = targeter.lockedActor;
 				vector = gun.GetCalculatedTargetPosition(lockedActor, true);
 			}
 			else
@@ -60,15 +60,15 @@ public class HPEquipSG : HPEquipGun, IMassObject
 
 	public virtual void SatelliteTargeting(OpticalTargeter targeter)
 	{
-		Vector3 targetPosition = GetTargetPosition(targeter);
+		var targetPosition = GetTargetPosition(targeter);
 		if (turret.position.y < Height * 0.95f)
 		{
 			MoveSol(this.transform.position);
 		}
-		Transform transform = gun.fireTransforms[0];
-		Quaternion quaternion = Quaternion.LookRotation(targetPosition - transform.position);
-		float num = gun.isFiring ? firingSpeed : slewSpeed;
-		float maxDegreesDelta = num * Time.deltaTime;
+		var transform = gun.fireTransforms[0];
+		var quaternion = Quaternion.LookRotation(targetPosition - transform.position);
+		var num = gun.isFiring ? firingSpeed : slewSpeed;
+		var maxDegreesDelta = num * Time.deltaTime;
 		quaternion = Quaternion.RotateTowards(transform.rotation, quaternion, maxDegreesDelta);
 		transform.rotation = quaternion;
 		
@@ -92,7 +92,7 @@ public class HPEquipSG : HPEquipGun, IMassObject
 
 	public override void OnStopFire()
 	{
-		bool flag = !_windingWeapon || gun.currentAmmo <= 0;
+		var flag = !_windingWeapon || gun.currentAmmo <= 0;
 		if (flag)
 		{
 			base.OnStopFire();
@@ -105,7 +105,7 @@ public class HPEquipSG : HPEquipGun, IMassObject
 
 	public virtual void MoveSol(Vector3 xz)
 	{
-		bool flag = turret.rotation != Quaternion.identity;
+		var flag = turret.rotation != Quaternion.identity;
 		if (flag)
 		{
 			turret.rotation = Quaternion.identity;

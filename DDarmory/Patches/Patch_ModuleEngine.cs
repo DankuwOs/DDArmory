@@ -25,11 +25,10 @@ public class Patch_ModuleEngine
         for (var i = 0; i < _weaponManager.equipCount; i++)
         {
             var equip = _weaponManager.GetEquip(i);
-            if (!(equip is HPEquipThrustReverser reverser)) continue;
+            if (equip is not HPEquipThrustReverser reverser) continue;
 
             if (!reverser.engines.Contains(__instance))
                 return;
-
 
             var animTime = reverser.animationToggle.GetT();
 

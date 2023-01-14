@@ -84,24 +84,6 @@ public class HPEquipLaserWings : HPEquippable, IMassObject
         firedEvent.Invoke(false);
     }
 
-    public override void OnConfigAttach(LoadoutConfigurator configurator)
-    {
-        base.OnConfigAttach(configurator);
-
-        foreach (var particleSystem in _particleSystems) particleSystem.Play();
-
-        source.Play();
-    }
-
-    public override void OnConfigDetach(LoadoutConfigurator configurator)
-    {
-        base.OnConfigDetach(configurator);
-
-        foreach (var particleSystem in _particleSystems) particleSystem.Stop();
-
-        source.Stop();
-    }
-
     public float GetMass()
     {
         return 0.005f;

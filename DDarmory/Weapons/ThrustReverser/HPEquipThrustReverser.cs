@@ -31,6 +31,9 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
     protected override void OnEquip()
     {
         base.OnEquip();
+        
+        if (!weaponManager)
+            return;
 
         var vcm = weaponManager.GetComponent<VehicleControlManifest>();
         if (!vcm)

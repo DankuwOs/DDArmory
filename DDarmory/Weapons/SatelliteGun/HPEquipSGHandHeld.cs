@@ -49,7 +49,7 @@ public class HPEquipSGHandHeld : HPEquipSG
 	public override void FixedUpdate()
 	{
 		base.FixedUpdate();
-		bool held = _held;
+		var held = _held;
 		if (!held)
 		{
 			laser.localPosition = Vector3.Lerp(laser.localPosition, returnVector, returnSpeed * Time.deltaTime);

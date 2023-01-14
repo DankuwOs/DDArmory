@@ -8,7 +8,7 @@ public class OmlAimPoint : OpticalMissileLauncher
 	// Token: 0x0600006F RID: 111 RVA: 0x00004438 File Offset: 0x00002638
 	public IEnumerator NewUpdateRoutine()
 	{
-		bool flag = !fwdObj;
+		var flag = !fwdObj;
 		IEnumerator result;
 		if (flag)
 		{
@@ -16,10 +16,10 @@ public class OmlAimPoint : OpticalMissileLauncher
 		}
 		else
 		{
-			Traverse traverse = Traverse.Create(this);
+			var traverse = Traverse.Create(this);
 			while (weaponEnabled && !htOml._tgt && htOml._headTracking)
 			{
-				Vector3 vector = fwdObj.transform.forward * 1000f;
+				var vector = fwdObj.transform.forward * 1000f;
 				traverse.Field("fwdLocalAimPos").SetValue(vector);
 			}
 			result = base.UpdateRoutine();

@@ -26,14 +26,14 @@ public class DDRocketLauncher : RocketLauncher
 
 	private IEnumerator Rotate()
 	{
-		float rotationAmount = rotation;
+		var rotationAmount = rotation;
 		if (fireCount >= secondaryRotationNumber && doSecondaryRotation)
 		{
 			rotationAmount = secondaryRotation;
 		}
 		
-		Quaternion targetRotation = Quaternion.Euler(rotaryTransform.localRotation.eulerAngles + new Vector3(0f, 0f, rotationAmount));
-		float rotateTime = 0f;
+		var targetRotation = Quaternion.Euler(rotaryTransform.localRotation.eulerAngles + new Vector3(0f, 0f, rotationAmount));
+		var rotateTime = 0f;
 		while (true)
 		{
 			rotaryTransform.localRotation = Quaternion.Euler(Vector3.Lerp(rotaryTransform.localRotation.eulerAngles,

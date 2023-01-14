@@ -1,22 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Harmony;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
 [RequireComponent(typeof(SwingWingController))]
-public class HPEquipSwingWing : HPEquippable, IMassObject
+public class HPEquipWing : HPEquippable, IMassObject
 {
     public float mass = 0.25f;
 
-    [Header("Swing Wing")]
-
-    [Range(0, 1)] public float defaultSweep = 0;
-
-    public SwingWingController controller;
-
-    public bool manualByDefault;
-    
     [Header("Parts")]
     public AeroController.ControlSurfaceTransform[] controlSurfaces;
     
@@ -27,7 +19,12 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
 
     public string[] disableObjects;
 
+    public WingController controller;
+
     private WeaponManager _weaponManager;
+
+    [Tooltip("List of hardpoints, goes this (Modified HP, Parent of HP, Position, Rotation)")] 
+    private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
 
     protected override void OnEquip()
     {
@@ -39,25 +36,40 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
     public override void OnConfigAttach(LoadoutConfigurator configurator)
     {
         base.OnConfigAttach(configurator);
+        if (configurator.uiOnly)
+            return;
         
-        if (!VTOLMPUtils.IsMultiplayer())
-            Initialize(configurator);
+        Initialize(configurator);
     }
 
     public override void OnConfigDetach(LoadoutConfigurator configurator)
     {
-        base.OnConfigDetach(configurator);
+        if (configurator.uiOnly)
+            return;
 
-        if (!VTOLMPUtils.IsMultiplayer())
-            Initialize(configurator);
-        
         foreach (var disableObject in disableObjects)
         {
             ToggleObject(disableObject, true);
         }
+
+        if (hpTransforms.Count > 0)
+        {
+            foreach (var hpTransform in hpTransforms)
+            {
+                if (hpTransform.Item1 && hpTransform.Item2)
+                {
+                    var tf = hpTransform.Item1;
+                    tf.SetParent(hpTransform.Item2);
+                    tf.localPosition = hpTransform.Item3;
+                    tf.localRotation = hpTransform.Item4;
+                }
+            }
+        }
+        
+        base.OnConfigDetach(configurator);
     }
 
-    public void Initialize(LoadoutConfigurator configurator = null)
+    public virtual void Initialize(LoadoutConfigurator configurator = null)
     {
         _weaponManager = weaponManager;
         if (!_weaponManager && configurator != null)
@@ -102,7 +114,7 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
         {
             // Adding my own control surfaces to the existing ones.
             
-            for (int i = 0; i < controlSurfaces.Length; i++)
+            for (var i = 0; i < controlSurfaces.Length; i++)
             {
                 var controlSurfaceTransform = controlSurfaces[i];
 
@@ -125,18 +137,26 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
                 
                 aeroController.controlSurfaces[i].Init();
             }
-
-            
-            controller.aeroController = aeroController;
         }
+        
+        
 
         // Moving hardpoints to my own
+
+        hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
+        
         for (var index = 0; index < hardpoints.Length; index++)
         {
+            
             var hardpoint = hardpoints[index];
+
             if (_weaponManager.hardpointTransforms[index] && hardpoint)
             {
                 var wmHp = _weaponManager.hardpointTransforms[index];
+
+                hpTransforms.Add(new Tuple<Transform, Transform, Vector3, Quaternion>(wmHp, wmHp.parent,
+                    wmHp.localPosition, wmHp.localRotation));
+                
                 wmHp.SetParent(hardpoint);
                 wmHp.localPosition = Vector3.zero;
                 wmHp.localRotation = Quaternion.identity;
@@ -167,25 +187,7 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
             wing.enabled = true;
         }
 
-        // Setting manual | auto mode
-        if (manualByDefault)
-        {
-            controller.display.manualObj.SetVisibility(false);
-            controller.display.autoObj.SetVisibility(true);
-            controller.manual = true;
-        }
-        else
-        {
-            controller.display.manualObj.SetVisibility(true);
-            controller.display.autoObj.SetVisibility(false);
-            controller.manual = false;
-        }
-
         var flightInfo = _weaponManager.actor.flightInfo;
-
-        if (flightInfo)
-            controller.flightInfo = flightInfo;
-        
         
         // Set up wing vapor
         foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>())
@@ -197,16 +199,6 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
         // Set up nav / strobe / formation lights
         controller.battery = _weaponManager.battery;
         controller.SetupLights();
-
-        if (_weaponManager.battery)
-            controller.toggle.battery = _weaponManager.battery;
-        
-        var sweepLever = GetComponentInChildren<VRThrottle>();
-        
-        if (sweepLever)
-            sweepLever.RemoteSetThrottle(1 - defaultSweep);
-        
-        controller.SetPivotImmediate(defaultSweep);
     }
 
     public void ToggleObject(string path, bool enable = false)
@@ -226,8 +218,16 @@ public class HPEquipSwingWing : HPEquippable, IMassObject
         
         t.gameObject.SetActive(enable);
     }
-    
-    
+
+    public override int GetMaxCount()
+    {
+        return 1; // If max count > count then reloading will reattach the weapon. this means that we can repair the wings.
+    }
+
+    public override int GetCount()
+    {
+        return 0;
+    }
 
     public float GetMass()
     {

@@ -7,21 +7,21 @@ public class HPEquipMDS : HPEquippable, IMassObject
 	{
 		if (weaponManager.lockingRadar && weaponManager.lockingRadar.currentLock.actor)
 		{
-			Actor actor = weaponManager.actor;
-			Actor actor2 = weaponManager.lockingRadar.currentLock.actor;
-			FlightInfo component = actor.GetComponent<FlightInfo>();
+			var actor = weaponManager.actor;
+			var actor2 = weaponManager.lockingRadar.currentLock.actor;
+			var component = actor.GetComponent<FlightInfo>();
 			SwapActors(actor, actor2, component);
 		}
 	}
 
 	public void SwapActors(Actor player, Actor lockedActor, FlightInfo playerFlightInfo)
 	{
-		Rigidbody vesselRB = player.weaponManager.vesselRB;
-		Rigidbody component = lockedActor.GetComponent<Rigidbody>();
+		var vesselRB = player.weaponManager.vesselRB;
+		var component = lockedActor.GetComponent<Rigidbody>();
 		playerFlightInfo.PauseGCalculations();
-		Vector3 position = vesselRB.position;
-		Vector3 velocity = vesselRB.velocity;
-		Quaternion rotation = vesselRB.rotation;
+		var position = vesselRB.position;
+		var velocity = vesselRB.velocity;
+		var rotation = vesselRB.rotation;
 		vesselRB.MovePosition(component.position);
 		vesselRB.velocity = component.velocity;
 		vesselRB.MoveRotation(component.rotation);
@@ -29,7 +29,7 @@ public class HPEquipMDS : HPEquippable, IMassObject
 		if (component.isKinematic)
 		{
 			Debug.Log("Attempted to swap places (KINEMATIC)");
-			KinematicPlane component2 = component.GetComponent<KinematicPlane>();
+			var component2 = component.GetComponent<KinematicPlane>();
 			component2.fixedPoint.point = position;
 			component2.rb.velocity = velocity;
 			component2.transform.rotation = rotation;

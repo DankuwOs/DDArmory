@@ -13,8 +13,8 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 			_material = internalMesh.material;
 			_brightness = _material.GetFloat(brightnessProp);
 			_tintColor = _material.GetColor(tintProp);
-			Hitbox[] componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
-			foreach (Hitbox hitbox in componentsInChildren)
+			var componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
+			foreach (var hitbox in componentsInChildren)
 			{
 				if (!hitboxes.ContainsKey(hitbox))
 				{
@@ -33,22 +33,22 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 	{
 		Debug.Log("Setting up transforms for '" + shortName + "'");
 
-		for (int i = 0; i < armorTfs.Length; i++)
+		for (var i = 0; i < armorTfs.Length; i++)
 		{
 			var armorTf = armorTfs[i];
 			var path = paths[i];
 			var localPosition = localPositions[i];
 			var localRotation = localRotations[i];
 			
-			string[] array = path.Split('/');
+			var array = path.Split('/');
 			if (!(array.Length > 0))
 			{
 				break;
 			}
 			
-			Transform transform = weaponManager.transform;
+			var transform = weaponManager.transform;
 			
-			foreach (string n in array)
+			foreach (var n in array)
 			{
 				if (!transform)
 				{
@@ -71,9 +71,9 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 	{
 		if (isEquipped)
 		{
-			float num = powerDraw * _brightness * Time.deltaTime;
+			var num = powerDraw * _brightness * Time.deltaTime;
 			_battery.Drain(num);
-			bool sufficientCharge = _battery.currentCharge > num  && _battery.connected;
+			var sufficientCharge = _battery.currentCharge > num  && _battery.connected;
 			
 			_brightness = Mathf.Clamp(sufficientCharge? _brightness : 0f, minBrightness, maxBrightness);
 		}
@@ -114,8 +114,8 @@ public class HPEquipSoakieSystem : HPEquippable, IMassObject
 		{
 			float num;
 			hitboxes.TryGetValue(hb, out num);
-			float num2 = hb.subtractiveArmor - damage;
-			bool flag3 = num2 < num;
+			var num2 = hb.subtractiveArmor - damage;
+			var flag3 = num2 < num;
 			if (flag3)
 			{
 				hb.subtractiveArmor = num;

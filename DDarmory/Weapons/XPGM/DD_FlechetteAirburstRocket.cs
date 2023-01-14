@@ -23,16 +23,16 @@ public class DD_FlechetteAirburstRocket : Rocket
 		while (true)
 		{
 			RaycastHit raycastHit;
-			bool flag = !Physics.Raycast(rayTf.position, rayTf.forward, out raycastHit, distance);
+			var flag = !Physics.Raycast(rayTf.position, rayTf.forward, out raycastHit, distance);
 			if (!flag)
 			{
 				break;
 			}
 			yield return null;
 		}
-		for (int i = 0; i < particleSystems.Length; i++)
+		for (var i = 0; i < particleSystems.Length; i++)
 		{
-			ParticleSystem ps = particleSystems[i];
+			var ps = particleSystems[i];
 			ps.gameObject.transform.SetParent(null);
 			ps.transform.position = transform.position;
 			ps.transform.rotation = transform.rotation;

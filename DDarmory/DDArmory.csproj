@@ -57,6 +57,9 @@
         <Reference Include="UnityEngine">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.AnimationModule">
+          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.AssetBundleModule">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
         </Reference>
@@ -65,6 +68,9 @@
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
@@ -78,6 +84,9 @@
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.UI">
+          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UI.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <AppDesigner Include="Properties\" />
@@ -85,6 +94,7 @@
     <ItemGroup>
         <Compile Include="Main.cs" />
         <Compile Include="Patches\Patch_Health_Damage.cs" />
+        <Compile Include="Patches\Patch_LoadoutConfigurator.cs" />
         <Compile Include="Patches\Patch_ModuleEngine.cs" />
         <Compile Include="Patches\Patch_Wing.cs" />
         <Compile Include="Patches\Patch_WingVaporParticles.cs" />
@@ -102,6 +112,10 @@
         <Compile Include="Weapons\Guidance\imtargetedlmao.cs" />
         <Compile Include="Weapons\Guidance\JAARMGuidance.cs" />
         <Compile Include="Weapons\Guidance\LoiterGuidance.cs" />
+        <Compile Include="Weapons\HandheldCamera\Text Scripts\DriveUsage.cs" />
+        <Compile Include="Weapons\HandheldCamera\Text Scripts\ImagesTaken.cs" />
+        <Compile Include="Weapons\HandheldCamera\Text Scripts\RamUsage.cs" />
+        <Compile Include="Weapons\HandheldCamera\Text Scripts\SavingStatus.cs" />
         <Compile Include="Weapons\JAARM\HPEquipJAARM.cs" />
         <Compile Include="Weapons\JAARM\RadarMissile.cs" />
         <Compile Include="Weapons\LaserWings\GetTeam.cs" />
@@ -109,37 +123,36 @@
         <Compile Include="Weapons\LaserWings\WingsSync.cs" />
         <Compile Include="Weapons\LaserWings\WingsTouch.cs" />
         <Compile Include="Weapons\MDS\HPEquipMDS.cs" />
-        <Compile Include="Weapons\SatelliteGun\GrabInteractable.cs" />
         <Compile Include="Weapons\SatelliteGun\HPEquipSG.cs" />
         <Compile Include="Weapons\SatelliteGun\HPEquipSGHandHeld.cs" />
         <Compile Include="Weapons\SatelliteGun\SGSync.cs" />
-        <Compile Include="Weapons\ScreenshotGun\HPEquipScreenshotGun.cs" />
+        <Compile Include="Weapons\HandheldCamera\HPEquipScreenshotGun.cs" />
         <Compile Include="Weapons\Soakie\CRTRenderer.cs" />
         <Compile Include="Weapons\Soakie\HPEquipSoakieSystem.cs" />
         <Compile Include="Weapons\Soakie\HPEquipSoakieSystemCRT.cs" />
         <Compile Include="Weapons\Soakie\HPEquipSoakieSystemMulticrew.cs" />
         <Compile Include="Weapons\Soakie\SoakieSystemSync.cs" />
-        <Compile Include="Weapons\Swing Wing\Display Components\SweepBar.cs" />
-        <Compile Include="Weapons\Swing Wing\Display Components\SweepDisplay.cs" />
-        <Compile Include="Weapons\Swing Wing\Display Components\SweepMode.cs" />
-        <Compile Include="Weapons\Swing Wing\HPEquipSwingWing.cs" />
-        <Compile Include="Weapons\Swing Wing\SweptWing.cs" />
-        <Compile Include="Weapons\Swing Wing\SwingWingController.cs" />
         <Compile Include="Weapons\ThrustReverser\HPEquipThrustReverser.cs" />
         <Compile Include="Weapons\Utils\DebugLinesManager.cs" />
         <Compile Include="Weapons\Utils\FindTransform.cs" />
+        <Compile Include="Weapons\Utils\GrabInteractable.cs" />
+        <Compile Include="Weapons\Wings\HPEquipWing.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepBar.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepDisplay.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepMode.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\HPEquipSwingWing.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\SweptWing.cs" />
+        <Compile Include="Weapons\Wings\Swing Wing\SwingWingController.cs" />
+        <Compile Include="Weapons\Wings\WingController.cs" />
         <Compile Include="Weapons\XPGM\DDRocketLauncher.cs" />
         <Compile Include="Weapons\XPGM\DD_FlechetteAirburstRocket.cs" />
         <Compile Include="Weapons\XPGM\HPEquipHeadTrackOML.cs" />
         <Compile Include="Weapons\XPGM\OmlAimPoint.cs" />
     </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Weapons\Swing Wing\Syncs" />
-    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <PostBuildEvent>copy "$(TargetPath)" "D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\VTOLVR_ModLoader\projects\My Mods\DDArmory\Builds\DDArmory.dll"
-            copy "$(TargetPath)" "D:\Programs n Friends\[000] Unity Projects\VTOLVR v1.4.13\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll"
+            copy "$(TargetPath)" "D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.5.4 L2\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll"
         </PostBuildEvent>
     </PropertyGroup>
 </Project>

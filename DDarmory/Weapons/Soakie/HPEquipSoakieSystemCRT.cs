@@ -12,8 +12,8 @@ public class HPEquipSoakieSystemCRT : HPEquippable, IMassObject
 
 		crts = GetComponentsInChildren<CRTRenderer>();
 			
-		Hitbox[] componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
-		foreach (Hitbox hitbox in componentsInChildren)
+		var componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
+		foreach (var hitbox in componentsInChildren)
 		{
 			if (!hitboxes.ContainsKey(hitbox))
 			{
@@ -28,22 +28,22 @@ public class HPEquipSoakieSystemCRT : HPEquippable, IMassObject
 	{
 		Debug.Log("Setting up transforms for '" + shortName + "'");
 
-		for (int i = 0; i < armorTfs.Length; i++)
+		for (var i = 0; i < armorTfs.Length; i++)
 		{
 			var armorTf = armorTfs[i];
 			var path = paths[i];
 			var localPosition = localPositions[i];
 			var localRotation = localRotations[i];
 			
-			string[] array = path.Split('/');
+			var array = path.Split('/');
 			if (!(array.Length > 0))
 			{
 				break;
 			}
 			
-			Transform transform = weaponManager.transform;
+			var transform = weaponManager.transform;
 			
-			foreach (string n in array)
+			foreach (var n in array)
 			{
 				if (!transform)
 				{
@@ -66,9 +66,9 @@ public class HPEquipSoakieSystemCRT : HPEquippable, IMassObject
 	{
 		if (!isEquipped) return;
 		
-		float num = powerDraw * Time.deltaTime;
+		var num = powerDraw * Time.deltaTime;
 		_battery.Drain(num);
-		bool toggle = _battery.currentCharge > num && _battery.connected;
+		var toggle = _battery.currentCharge > num && _battery.connected;
 		foreach (var crtRenderer in crts)
 		{
 			if (crtRenderer.crtEnabled)
@@ -83,8 +83,8 @@ public class HPEquipSoakieSystemCRT : HPEquippable, IMassObject
 		if (!hb) return;
 
 		hitboxes.TryGetValue(hb, out var num);
-		float num2 = hb.subtractiveArmor - damage;
-		bool flag3 = num2 < num;
+		var num2 = hb.subtractiveArmor - damage;
+		var flag3 = num2 < num;
 		if (flag3)
 		{
 			hb.subtractiveArmor = num;

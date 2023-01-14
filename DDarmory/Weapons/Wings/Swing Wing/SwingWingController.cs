@@ -6,9 +6,9 @@ using UnityEngine;
 using VTOLVR.Multiplayer;
 
 
-public class SwingWingController : MonoBehaviour
+public class SwingWingController : WingController
 {
-    [Header("Wings")]
+    [Header("Swing Wings")]
     public RotationToggle toggle;
     
     public AnimationCurve sweepMachCurve;
@@ -23,28 +23,11 @@ public class SwingWingController : MonoBehaviour
     [Range(0.02f,0.2f)]
     public float pivotDiffToManual = 0.05f;
 
-    [Tooltip("Path to a VRLever separated by a '/'")]
-    public string navSwitchPath;
-
-    [Header("Ext. Lights")] 
-    public StrobeLightController.StrobeLight[] strobeLights;
-
-    public ObjectPowerUnit[] navLightPowerUnits;
-
-    public FormationGlowController formationGlowController;
-
     [NonSerialized]
     public bool manual;
 
     [NonSerialized] 
-    public FlightInfo flightInfo = null;
-
-    [NonSerialized] 
-    public Battery battery;
-
-    [NonSerialized] 
     public AeroController aeroController;
-
 
     private float currentSweep;
 
@@ -61,6 +44,7 @@ public class SwingWingController : MonoBehaviour
 
         CheckSurfaces();
     }
+    
 
     public void SetPivotImmediate(float pivot)
     {
@@ -69,27 +53,35 @@ public class SwingWingController : MonoBehaviour
         if (display)
             display.targetSweep.SetScale(pivot);
     }
+    
 
     public void SetPivot(float pivot)
     {
         if (!manual)
         {
-            if (Mathf.Abs(pivot - _lastPivot) > pivotDiffToManual)
+            // When in Auto mode and battery dead the sweep bar will skip, this fixes that in a bad way.
+            if (useBattery && (!battery.connected || (battery.connected && battery.currentCharge < 0.05f)))
+                goto mothersHouseOutsideOfIfStatementGetFucked;
+
+            if (Math.Abs(pivot - _lastPivot) > pivotDiffToManual)
                 ToggleMode();
             else
                 return;
         }
+        mothersHouseOutsideOfIfStatementGetFucked: // Yes, I know. Bad practice and unreadable, don't care didn't ask.
 
         toggle.SetNormalizedRotation(pivot);
 
         if (display)
             display.targetSweep.SetScale(pivot);
+        
         _lastPivot = pivot;
     }
+    
 
     public void ToggleMode()
     {
-        if (useBattery && battery.connected && battery.currentCharge < 0.05f) 
+        if (useBattery && (!battery.connected || (battery.connected && battery.currentCharge < 0.05f))) 
             return;
         
         if (manual)
@@ -103,6 +95,7 @@ public class SwingWingController : MonoBehaviour
         display.manualObj.SetVisibility(false);
         display.autoObj.SetVisibility(true);
     }
+    
 
     public void AutoSweep()
     {
@@ -113,7 +106,7 @@ public class SwingWingController : MonoBehaviour
         display.targetSweep.SetScale(autoSweep);
         toggle.SetNormalizedRotation(autoSweep);
     }
-
+    
     
     public void CheckSurfaces()
     {
@@ -173,75 +166,6 @@ public class SwingWingController : MonoBehaviour
                         break;
                 }
             }
-        }
-    }
-
-    public void SetupLights()
-    {
-        Transform startTf = null;
-        if (flightInfo)
-        {
-            startTf = flightInfo.transform;
-        }
-        else
-        {
-            Debug.Log($"[Swing Wing Controller]: No start transform. :~(");
-            return;
-        }
-        
-        
-        if (!battery)
-        {
-            Debug.Log($"[Swing Wing Controller]: Battery gone!");
-            return;
-        }
-
-        var navSwitch = FindTransform.FindTranny(startTf, navSwitchPath)?.GetComponent<VRLever>();
-        var strobeController = startTf.GetComponentInChildren<StrobeLightController>();
-
-        if (VTOLMPUtils.IsMultiplayer())
-        {
-            var extLightSync = startTf.GetComponentInChildren<ExteriorLightSync>();
-            
-            if (extLightSync && formationGlowController)
-                extLightSync.formationLights = formationGlowController;
-        }
-
-        if (navSwitch)
-        {
-            var navLightController = startTf.GetComponentInChildren<NavLightController>();
-            
-            // Assigning battery to fix null
-            foreach (var navLightPowerUnit in navLightPowerUnits)
-            {
-                navLightPowerUnit.battery = battery;
-            }
-
-            foreach (var formationLight in formationGlowController.lights)
-            {
-                formationLight.battery = battery;
-            }
-
-            // Adding units to list
-            if (navLightController)
-            {
-                Debug.Log($"[Swing Wing Controller]: Found nav light controller, count = {navLightController.powerUnits.Length}");
-                var powerUnits = navLightController.powerUnits.ToList(); // Maybe need?
-                powerUnits.AddRange(navLightPowerUnits);
-                navLightController.powerUnits = powerUnits.ToArray();
-                Debug.Log($"[Swing Wing Controller]: Found nav light controller, count after = {navLightController.powerUnits.Length}");
-            }
-
-            // Toggling formation with switch.
-            navSwitch.OnSetState.AddListener(delegate(int state)
-            {
-                formationGlowController.SetStatus(state);
-            });
-        }
-        
-        if (strobeController)
-        {
-            strobeController.lights.AddRange(strobeLights);
         }
     }
 }
