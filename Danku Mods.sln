@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDArmory", "DDArmory\DDArmory.csproj", "{7BB21F11-6675-4E25-AB78-E420A6B129C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotBDArmory", "..\NotBDArmory\NotBDArmory\NotBDArmory.csproj", "{7BB21F11-6675-4E25-AB78-E420A6B129C2}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomWeaponBase", "..\Custom Weapon Base\CustomWeaponBase\CustomWeaponBase.csproj", "{7BB21F11-6675-4E25-AB78-E420A6B129C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotBDArmory", "..\NotBDArmory\NotBDArmory\NotBDArmory.csproj", "{7BB21F11-6675-4E25-AB78-E420A6B129C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vietnam Weapons Pack", "..\Canary Weapons Pack\Vietnam Weapons Pack\Vietnam Weapons Pack.csproj", "{7BB21F11-6675-4E25-AB78-E420A6B129C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,5 +27,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C519B528-F7E4-454C-B70A-AC9637392A23}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

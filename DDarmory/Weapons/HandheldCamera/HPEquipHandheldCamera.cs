@@ -5,55 +5,48 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.Profiling.Experimental;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
-namespace DDArmory.Weapons.ScreenshotGun
-{
-    public class HPEquipScreenshotGun : HPEquippable, IMassObject
+    public class HPEquipHandheldCamera : HPEquippable, IMassObject
     {
-        [Header("Camera")]
-        public Vector2 resolution;
+        [Header("Camera")] public Vector2 resolution;
 
         public Camera camera;
 
-        public GrabInteractable interactable;
+        public CWB_GrabInteractable interactable;
 
         public float timeBetweenShots = 0.2f;
 
         public MinMax fieldOfView;
-        
-        [Header("Text")]
-        public RamUsage ramUsage;
+
+        [Header("Text")] public RamUsage ramUsage;
 
         public DriveUsage driveUsage;
 
         public PicturesTaken imagesTaken;
 
         public SavingStatus savingStatus;
-        
-        [Header("Events")]
-        public GameObject flashObject;
-        
+
+        [Header("Events")] public GameObject flashObject;
+
         public UnityEvent OnCapture = new UnityEvent();
+    
+        public UnityEvent OnFlashEnabled = new UnityEvent();
 
-        public UnityEvent<bool> OnSetFlash = new UnityEvent<bool>();
+        public UnityEvent OnFlashDisabled = new UnityEvent();
 
-        private VRHandController _controller = null;
+        private VRHandController _controller;
 
         private List<byte[]> _heldBuffers = new List<byte[]>();
 
         private PerformanceCounter _memCounter;
 
         private Coroutine _screenshotRoutine;
-        
-        private readonly string _imageDirectory = $"{VTResources.gameRootDirectory}/Screenshots/DDArmory Camera";
+
+        private string _imageDirectory;
 
         private DirectoryInfo _imageDirectoryInfo;
 
@@ -68,46 +61,52 @@ namespace DDArmory.Weapons.ScreenshotGun
             base.OnEquip();
 
             if (!interactable) return;
-            
-            
+        
             interactable.interactable.OnStartInteraction += controller =>
             {
                 _controller = controller;
                 controller.OnTriggerClicked += OnTriggerClicked;
                 controller.OnTriggerClickReleased += OnTriggerClickReleased;
 
-                controller.OnSecondaryThumbButtonPressed += ToggleFlash;
+                controller.OnThumbButtonPressed += ToggleFlash;
             };
             interactable.interactable.OnStopInteraction += _ =>
             {
                 OnTriggerClickReleased(null); // Ensure camera doesn't continue to screenshot.
                 _controller.OnTriggerClicked -= OnTriggerClicked;
                 _controller.OnTriggerClickReleased -= OnTriggerClickReleased;
-                
-                _controller.OnSecondaryThumbButtonPressed -= ToggleFlash;
-                    
+
+                _controller.OnThumbButtonPressed -= ToggleFlash;
+
                 _controller = null;
             };
+
+            _imageDirectory = $"{VTResources.gameRootDirectory}/Screenshots/DDArmory Camera";
 
             if (!Directory.Exists(_imageDirectory))
                 Directory.CreateDirectory(_imageDirectory);
             _imageDirectoryInfo = new DirectoryInfo(_imageDirectory);
-            
+
             imagesTaken.AddToCount(_imageDirectoryInfo.GetFiles().Length);
         }
 
         #region Controls
-        
+
         public void OnTriggerClicked(VRHandController useless)
+        {
+            TriggerClick(); // Creating a new method so you can override it without also needing to overriding start.
+        }
+
+        public virtual void TriggerClick()
         {
             if (_saving || _controller == null)
                 return;
-            
+
             if (_screenshotRoutine != null)
-                StopCoroutine(_screenshotRoutine);
+                return;
 
             _capturing = true;
-            
+
             _screenshotRoutine = StartCoroutine(ScreenshotRoutine());
         }
 
@@ -121,28 +120,31 @@ namespace DDArmory.Weapons.ScreenshotGun
         public void ToggleFlash(VRHandController useless)
         {
             _flashEnabled = !_flashEnabled;
-            OnSetFlash.Invoke(!_flashEnabled);
-        }
         
+            if (_flashEnabled)
+                OnFlashEnabled.Invoke();
+            else
+                OnFlashDisabled.Invoke();
+        }
+
         #endregion
 
         private void FixedUpdate()
         {
             if (!_capturing)
                 return;
-            
-            if (driveUsage && driveUsage.GetDrivePercentUsed() >= 0.85f) // Prevent using too much storage
+
+            if (driveUsage && driveUsage.GetDrivePercentUsed() >= 0.95f) // Prevent using too much storage
             {
                 _capturing = false;
                 SaveImages();
                 return;
             }
-            
-            if (ramUsage && ramUsage.GetPercentUsed() >= 0.85f) // Prevent using too much ram.
+
+            if (ramUsage && ramUsage.GetPercentUsed() >= 0.90f) // Prevent using too much ram.
             {
                 _capturing = false;
                 SaveImages();
-                return;
             }
         }
 
@@ -151,24 +153,24 @@ namespace DDArmory.Weapons.ScreenshotGun
 
         private IEnumerator ScreenshotRoutine()
         {
+            _heldBuffers = new List<byte[]>();
             while (_capturing && _controller != null)
             {
                 OnCapture.Invoke();
-                
+
                 Screenshot();
 
                 imagesTaken.AddToCount();
-                
+
                 yield return new WaitForSeconds(timeBetweenShots);
             }
-            
+
             SaveImages();
+            _screenshotRoutine = null;
         }
 
-        private void Screenshot()
+        public virtual void Screenshot()
         {
-            
-            
             if (flashObject && _flashEnabled)
                 StartCoroutine(FlashRoutine());
 
@@ -180,13 +182,14 @@ namespace DDArmory.Weapons.ScreenshotGun
             camera.targetTexture = renderTexture;
             camera.Render();
 
-            AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGBA32, OnCompleteReadback); // Using AsyncGPUReadback to get the images because it should be *much* more performant than bahas method.
+            AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGBA32,
+                OnCompleteReadback); // Using AsyncGPUReadback to get the images because it should be *much* more performant than bahas method.
 
             camera.targetTexture = prevTexture;
 
             RenderTexture.ReleaseTemporary(renderTexture);
         }
-        
+
         private void OnCompleteReadback(AsyncGPUReadbackRequest readbackRequest)
         {
             if (readbackRequest.hasError)
@@ -199,37 +202,45 @@ namespace DDArmory.Weapons.ScreenshotGun
 
         private void SaveImages()
         {
-            if (_heldBuffers.Count == 0 || _saving)
+            if (_heldBuffers == null || _saving)
                 return;
-            
-            
+
+
             _saving = true;
-            
+
             // Animation
-            if (savingStatus) 
+            if (savingStatus)
                 StartCoroutine(savingStatus.SaveRoutine());
 
             // Moved to creating a new thread to do all the work. Drastically improves performance.
 
-            var thread = new Thread(WriteImages);
+
+            ThreadStart start = WriteImages;
+            start += () =>
+            {
+                _heldBuffers = null;
+                GC.Collect();
+            };
+
+            var thread = new Thread(start) { IsBackground = true };
             thread.Start();
         }
 
         private void WriteImages()
         {
-            foreach (var png in _heldBuffers.Select(heldBuffer => ImageConversion.EncodeArrayToPNG(heldBuffer, GraphicsFormat.R8G8B8A8_SRGB, (uint)resolution.x, (uint)resolution.y)))
+            foreach (var png in _heldBuffers.Select(heldBuffer =>
+                         ImageConversion.EncodeArrayToPNG(heldBuffer, GraphicsFormat.R8G8B8A8_SRGB, (uint)resolution.x,
+                             (uint)resolution.y)))
             {
                 File.WriteAllBytes(FlybyCameraMFDPage.GetNewScreenshotFilepath(_imageDirectory), png);
             }
-            
-            _heldBuffers.Clear();
-            GC.Collect();
-            
-            _saving = false; 
-            if (savingStatus) 
+
+            _saving = false;
+            if (savingStatus)
                 savingStatus.saving = false;
+
         }
-        
+
         #endregion
 
         public void SetFov(float input)
@@ -248,7 +259,7 @@ namespace DDArmory.Weapons.ScreenshotGun
         public override void OnDestroy()
         {
             SaveImages();
-            
+
             base.OnDestroy();
         }
 
@@ -257,4 +268,3 @@ namespace DDArmory.Weapons.ScreenshotGun
             return 0;
         }
     }
-}

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Timers;
-using DDArmory.Weapons.Utils;
 using UnityEngine;
-using VTOLVR.Multiplayer;
 
 
 public class SwingWingController : WingController
@@ -60,7 +56,7 @@ public class SwingWingController : WingController
         if (!manual)
         {
             // When in Auto mode and battery dead the sweep bar will skip, this fixes that in a bad way.
-            if (useBattery && (!battery.connected || (battery.connected && battery.currentCharge < 0.05f)))
+            if (useBattery && battery != null && (!battery.connected || (battery.connected && battery.currentCharge < 0.05f)))
                 goto mothersHouseOutsideOfIfStatementGetFucked;
 
             if (Math.Abs(pivot - _lastPivot) > pivotDiffToManual)
@@ -112,7 +108,7 @@ public class SwingWingController : WingController
     {
         if (!aeroController)
             return;
-
+        
         foreach (var sweptWing in sweptWings)
         {
             sweptWing.SetWingArea(currentSweep);

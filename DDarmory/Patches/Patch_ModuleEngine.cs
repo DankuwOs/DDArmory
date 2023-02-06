@@ -1,5 +1,4 @@
 ﻿using Harmony;
-using UnityEngine;
 using VTOLVR.Multiplayer;
 
 [HarmonyPatch(typeof(ModuleEngine), nameof(ModuleEngine.Update))]

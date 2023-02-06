@@ -21,8 +21,6 @@ public class HPEquipWing : HPEquippable, IMassObject
 
     public WingController controller;
 
-    private WeaponManager _weaponManager;
-
     [Tooltip("List of hardpoints, goes this (Modified HP, Parent of HP, Position, Rotation)")] 
     private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
 
@@ -49,7 +47,7 @@ public class HPEquipWing : HPEquippable, IMassObject
 
         foreach (var disableObject in disableObjects)
         {
-            ToggleObject(disableObject, true);
+            ToggleObject(disableObject, configurator.wm, true);
         }
 
         if (hpTransforms.Count > 0)
@@ -71,31 +69,26 @@ public class HPEquipWing : HPEquippable, IMassObject
 
     public virtual void Initialize(LoadoutConfigurator configurator = null)
     {
-        _weaponManager = weaponManager;
-        if (!_weaponManager && configurator != null)
-            _weaponManager = configurator.wm;
-        
-        if (!_weaponManager)
-            return;
+        var wm = configurator ? configurator.wm : weaponManager;
 
-        var vesselVehiclePart = _weaponManager.GetComponent<VehiclePart>();
-        var aeroController = _weaponManager.GetComponent<AeroController>();
+        var vesselVehiclePart = wm.GetComponent<VehiclePart>();
+        var aeroController = wm.GetComponent<AeroController>();
 
         // Old objects are still present in lists and cause nullrefs, this fixes that while also adding our own objects.
         if (VTOLMPUtils.IsMultiplayer())
         {
-            var playerVehicleNetSync = _weaponManager.GetComponent<PlayerVehicleNetSync>();
+            var playerVehicleNetSync = wm.GetComponent<PlayerVehicleNetSync>();
             if (playerVehicleNetSync)
             {
-                var list = _weaponManager.GetComponentsInChildren<VehiclePart>();
+                var list = wm.GetComponentsInChildren<VehiclePart>();
 
                 playerVehicleNetSync.vehicleParts = list;
             }
             
-            var damageSync = _weaponManager.GetComponent<DamageSync>();
+            var damageSync = wm.GetComponent<DamageSync>();
             if (damageSync)
             {
-                var list = _weaponManager.GetComponentsInChildren<Health>();
+                var list = wm.GetComponentsInChildren<Health>();
 
                 damageSync.healths = list;
             }
@@ -113,7 +106,7 @@ public class HPEquipWing : HPEquippable, IMassObject
         if (aeroController)
         {
             // Adding my own control surfaces to the existing ones.
-            
+
             for (var i = 0; i < controlSurfaces.Length; i++)
             {
                 var controlSurfaceTransform = controlSurfaces[i];
@@ -150,9 +143,9 @@ public class HPEquipWing : HPEquippable, IMassObject
             
             var hardpoint = hardpoints[index];
 
-            if (_weaponManager.hardpointTransforms[index] && hardpoint)
+            if (wm.hardpointTransforms[index] && hardpoint)
             {
-                var wmHp = _weaponManager.hardpointTransforms[index];
+                var wmHp = wm.hardpointTransforms[index];
 
                 hpTransforms.Add(new Tuple<Transform, Transform, Vector3, Quaternion>(wmHp, wmHp.parent,
                     wmHp.localPosition, wmHp.localRotation));
@@ -170,24 +163,24 @@ public class HPEquipWing : HPEquippable, IMassObject
             {
                 configurator.DetachImmediate(i);
             }
-            if (_weaponManager.GetEquip(i))
-                _weaponManager.JettisonEq(i);
+            if (wm.GetEquip(i))
+                wm.JettisonEq(i);
         }
         
         // Toggling existing wings off
         foreach (var disableObject in disableObjects)
         {
-            ToggleObject(disableObject);
+            ToggleObject(disableObject, wm);
         }
         
         
         foreach (var wing in GetComponentsInChildren<Wing>(true))
         {
-            wing.rb = _weaponManager.vesselRB;
+            wing.rb = wm.vesselRB;
             wing.enabled = true;
         }
 
-        var flightInfo = _weaponManager.actor.flightInfo;
+        var flightInfo = wm.actor.flightInfo;
         
         // Set up wing vapor
         foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>())
@@ -197,13 +190,14 @@ public class HPEquipWing : HPEquippable, IMassObject
         
         
         // Set up nav / strobe / formation lights
-        controller.battery = _weaponManager.battery;
+        controller.battery = wm.battery;
+        controller.flightInfo = flightInfo;
         controller.SetupLights();
     }
 
-    public void ToggleObject(string path, bool enable = false)
+    public void ToggleObject(string path, WeaponManager wm, bool enable = false)
     {
-        var t = _weaponManager.transform;
+        var t = wm.transform;
 
         var subString = path.Split(new []{'/'}, StringSplitOptions.RemoveEmptyEntries);
 

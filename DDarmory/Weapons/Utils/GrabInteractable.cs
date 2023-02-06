@@ -1,53 +1,55 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class GrabInteractable : MonoBehaviour
-{
-	public virtual void Start()
+	public class GrabInteractable : MonoBehaviour
 	{
-		if (!interactable)
+		public virtual void Start()
 		{
-			interactable = GetComponent<VRInteractable>();
+			if (!interactable)
+			{
+				interactable = GetComponent<VRInteractable>();
+			}
+			interactable.OnStartInteraction += Ir_OnStartInteraction;
+			interactable.OnStopInteraction += Ir_OnStopInteraction;
 		}
-		interactable.OnStartInteraction += Ir_OnStartInteraction;
-		interactable.OnStopInteraction += Ir_OnStopInteraction;
-	}
 
-	public virtual void Ir_OnStartInteraction(VRHandController controller)
-	{
-		_grabbed = true;
-		_controllerTf = controller.transform;
-		_localPos = _controllerTf.InverseTransformPoint(transform.position);
-		_localRot = Quaternion.Inverse(_controllerTf.rotation) * transform.rotation;
-		StartCoroutine(HeldRoutine());
-	}
-
-	private IEnumerator HeldRoutine()
-	{
-		while (_grabbed)
+		public virtual void Ir_OnStartInteraction(VRHandController controller)
 		{
-			transform.position = Vector3.Lerp(transform.position, _controllerTf.TransformPoint(_localPos), lerpSpeed * Time.deltaTime);
-			transform.rotation = Quaternion.Lerp(transform.rotation, _controllerTf.rotation * _localRot, rotationLerpSpeed * 2f * Time.deltaTime);
-			yield return null;
+			_grabbed = true;
+			_controllerTf = controller.transform;
+			_localPos = _controllerTf.InverseTransformPoint(transform.position);
+			_localRot = Quaternion.Inverse(_controllerTf.rotation) * transform.rotation;
+			StartCoroutine(HeldRoutine());
 		}
-	}
 
-	public virtual void Ir_OnStopInteraction(VRHandController controller)
-	{
-		_grabbed = false;
-	}
+		private IEnumerator HeldRoutine()
+		{
+			while (_grabbed)
+			{
+				transform.position = Vector3.Lerp(transform.position, _controllerTf.TransformPoint(_localPos), lerpSpeed * Time.deltaTime);
+				transform.rotation = Quaternion.Lerp(transform.rotation, _controllerTf.rotation * _localRot, rotationLerpSpeed * 2f * Time.deltaTime);
+				yield return null;
+			}
+		
+		
+		}
 
-	public float lerpSpeed;
+		public virtual void Ir_OnStopInteraction(VRHandController controller)
+		{
+			_grabbed = false;
+		}
 
-	public float rotationLerpSpeed;
+		public float lerpSpeed;
 
-	public VRInteractable interactable;
+		public float rotationLerpSpeed;
 
-	private Transform _controllerTf;
+		public VRInteractable interactable;
+
+		private Transform _controllerTf;
 	
-	private Vector3 _localPos;
+		private Vector3 _localPos;
 
-	private Quaternion _localRot;
+		private Quaternion _localRot;
 
-	private bool _grabbed;
-}
+		private bool _grabbed;
+	}

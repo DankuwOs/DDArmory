@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 public class FunkMissile : MonoBehaviour
 {
-    public BurstMissile burstMissile;
+    public Missile burstMissile;
 
     public float delay;
 
@@ -16,6 +16,8 @@ public class FunkMissile : MonoBehaviour
     public float fov = 45;
 
     public MeshFilter baller;
+
+    public List<MissileFairing> fairings;
 
     public GameObject lineRendererObj;
 
@@ -48,7 +50,14 @@ public class FunkMissile : MonoBehaviour
 
     private async Task Funk()
     {
+        for (int i = 0; i < fairings.Count; i++)
+        {
+            fairings[i].Jettison();
+            await Task.Delay(50);
+        }
+        
         await Task.Delay(TimeSpan.FromSeconds(delay));
+        
         var targetedActors = new List<Actor>();
 
         var tgts = new List<Actor>();
@@ -74,7 +83,11 @@ public class FunkMissile : MonoBehaviour
                 break;
             }
 
-            if (!foundTarget) continue;
+            if (!foundTarget)
+            {
+                FakeLine(pos, normal);
+                continue;
+            }
 
             targetedActors.Add(tgtActor);
 
@@ -113,5 +126,44 @@ public class FunkMissile : MonoBehaviour
         }
 
         OnFunk.Invoke();
+    }
+
+    public void FakeLine(Vector3 pos, Vector3 normal)
+    {
+        if (Random.Range(0,15) != 7)
+            return;
+        
+        var laserGameObject = Instantiate(lineRendererObj, baller.transform, true);
+        laserGameObject.SetActive(true);
+        
+        var funkyLines = laserGameObject.GetComponent<FunkyLines>();
+        
+        // very hastily booled up
+        funkyLines.stopFixedUpdate = true;
+        funkyLines.fake = true;
+        
+        var lineRenderer = funkyLines.lineRenderer;
+        
+        lineRenderer.SetPositions(new[]
+        {
+            pos,
+            transform.InverseTransformPoint(normal * Random.Range(300,2000))
+        });
+
+        var randomColor = Random.ColorHSV(0, 1, 0.7f, 1);
+
+
+        var gradient = new Gradient
+        {
+            colorKeys = new[]
+            {
+                new GradientColorKey(randomColor, 0),
+                new GradientColorKey(randomColor, 1)
+            }
+        };
+
+        lineRenderer.colorGradient = gradient;
+        
+        Destroy(laserGameObject, Random.Range(2f, 10f));
     }
 }

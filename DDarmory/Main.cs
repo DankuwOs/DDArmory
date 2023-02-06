@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Harmony;
-using UnityEngine;
+﻿using Harmony;
 
 namespace DDArmory
 {
@@ -11,9 +9,7 @@ namespace DDArmory
             var harmonyInstance = HarmonyInstance.Create("danku.ddarmory");
             harmonyInstance.PatchAll();
 
-
             base.ModLoaded();
-
         }
     }
 }

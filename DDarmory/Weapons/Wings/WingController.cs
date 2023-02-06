@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Timers;
 using DDArmory.Weapons.Utils;
 using UnityEngine;
 using VTOLVR.Multiplayer;
@@ -35,14 +34,14 @@ public class WingController : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[Swing Wing Controller]: No start transform. :~(");
+            Debug.Log($"[Wing Controller]: No flight info. :~(");
             return;
         }
         
         
         if (!battery)
         {
-            Debug.Log($"[Swing Wing Controller]: Battery gone!");
+            Debug.Log($"[Wing Controller]: Battery gone!");
             return;
         }
 

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 public class SweptWing : MonoBehaviour
 {
@@ -14,7 +15,10 @@ public class SweptWing : MonoBehaviour
     
     public Wing wing;
     
-    public AnimationCurve curve;
+    [FormerlySerializedAs("curve")] 
+    public AnimationCurve liftAreaCurve;
+
+    public AnimationCurve dragCoefficientCurve;
 
     public Transform surface;
 
@@ -35,6 +39,7 @@ public class SweptWing : MonoBehaviour
         if (!wing)
             wing = GetComponent<Wing>();
         
-        wing.SetLiftArea(curve.Evaluate(sweep));
+        wing.dragCoefficient = dragCoefficientCurve.Evaluate(sweep);
+        wing.SetLiftArea(liftAreaCurve.Evaluate(sweep));
     }
 }

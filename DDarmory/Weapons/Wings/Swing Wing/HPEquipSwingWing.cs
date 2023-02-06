@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
-using VTOLVR.Multiplayer;
 
 [RequireComponent(typeof(SwingWingController))]
 public class HPEquipSwingWing : HPEquipWing
@@ -14,9 +13,6 @@ public class HPEquipSwingWing : HPEquipWing
     [Range(0, 1)] public float defaultSweep = 0;
 
     public bool manualByDefault;
-    
-
-    private WeaponManager _weaponManager;
 
     [Tooltip("List of hardpoints, goes this (Modified HP, Parent of HP, Position, Rotation)")] 
     private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
@@ -44,7 +40,7 @@ public class HPEquipSwingWing : HPEquipWing
 
         foreach (var disableObject in disableObjects)
         {
-            ToggleObject(disableObject, true);
+            ToggleObject(disableObject, configurator.wm, true);
         }
 
         if (hpTransforms.Count > 0)
@@ -67,15 +63,20 @@ public class HPEquipSwingWing : HPEquipWing
     public override void Initialize(LoadoutConfigurator configurator = null)
     {
         base.Initialize(configurator);
-        
-        if (!_weaponManager && configurator != null)
-            _weaponManager = configurator.wm;
-        
-        if (!_weaponManager || controller is not SwingWingController swingWingController)
+
+        var wm = configurator ? configurator.wm : weaponManager;
+
+        if (controller == null || controller.GetType() != typeof(SwingWingController))
             return;
 
+        var swingWingController = controller as SwingWingController;
 
-        // Setting manual | auto mode
+        var aeroController = wm.GetComponent<AeroController>();
+        
+        if (aeroController)
+            swingWingController.aeroController = aeroController;
+
+            // Setting manual | auto mode
         if (manualByDefault)
         {
             swingWingController.display.manualObj.SetVisibility(false);
@@ -89,20 +90,10 @@ public class HPEquipSwingWing : HPEquipWing
             swingWingController.manual = false;
         }
 
-        var flightInfo = _weaponManager.actor.flightInfo;
+        if (wm.battery)
+            swingWingController.toggle.battery = wm.battery;
 
-        if (flightInfo)
-            controller.flightInfo = flightInfo;
         
-        
-        // Set up wing vapor
-        foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>())
-        {
-            wingVaporParticles.flightInfo = flightInfo;
-        }
-
-        if (_weaponManager.battery)
-            swingWingController.toggle.battery = _weaponManager.battery;
         
         // Set default sweep
         var sweepLever = GetComponentInChildren<VRThrottle>();
