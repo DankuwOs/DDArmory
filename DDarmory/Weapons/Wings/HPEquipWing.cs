@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
-[RequireComponent(typeof(SwingWingController))]
+[RequireComponent(typeof(WingController))]
 public class HPEquipWing : HPEquippable, IMassObject
 {
     public float mass = 0.25f;
