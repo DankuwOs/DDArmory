@@ -29,11 +29,51 @@ public class SwingWingController : WingController
 
     private float _lastPivot;
 
+    private bool _isLocked;
+
+    private FlightAssist _assist;
+
     private void Update()
     {
         currentSweep = toggle.transforms[0].currentT;
         
         display.currentSweep.SetScale(currentSweep);
+        
+        if (!flightInfo)
+            return;
+
+        if (!_assist)
+        {
+            _assist = flightInfo.GetComponent<FlightAssist>();
+            if (!_assist)
+                Debug.Log($"[SwingWingController]: Can't find flight assist");
+        }
+        
+        if (_assist)
+        {
+            var currentG = Mathf.Abs(Vector3.Dot(flightInfo.acceleration, flightInfo.transform.up)) / 9.81f;
+            if (currentG > _assist.gLimit)
+            {
+                Debug.Log($"Current G = {currentG}");
+                _isLocked = true;
+                if (!manual)
+                {
+                    manual = true;
+                    display.manualObj.SetVisibility(false);
+                    display.autoObj.SetVisibility(true);
+                }
+
+                toggle.SetNormalizedRotation(currentSweep);
+
+                return;
+            }
+            if (_isLocked)
+            {
+                toggle.SetNormalizedRotation(_lastPivot);
+                _isLocked = false;
+            }
+        }
+            
         
         if (!manual)
             AutoSweep();

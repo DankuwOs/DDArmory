@@ -1,6 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
+using VTNetworking;
+using VTOLVR.Multiplayer;
 
-    public class HPEquipPolaroid : HPEquipHandheldCamera
+public class HPEquipPolaroid : HPEquipHandheldCamera
     {
 
         [Header("Polaroid")] 
@@ -8,42 +12,69 @@
 
         public Transform polaroidParent;
 
-        private PolaroidObject lastPolaroid;
+        public Texture remoteTexture;
+
+        private PolaroidObject _lastPolaroid;
+
+        [HideInInspector]
+        public bool remote;
 
         public override void Screenshot()
         {
             base.Screenshot();
             
-            SendPolaroid();
-        
+            StartCoroutine(SendPolaroid());
+            if (remote)
+                return;
+            
             var prevTexture = camera.targetTexture;
-        
-            camera.targetTexture = lastPolaroid.renderTexture;
+            
+            camera.targetTexture = _lastPolaroid.renderTexture;
             camera.Render();
-
+            
             camera.targetTexture = prevTexture;
         }
 
-        private void SendPolaroid()
+        public IEnumerator SendPolaroid()
         {
-            var newPolaroid = Instantiate(polaroidObject, polaroidParent);
+            GameObject newPolaroid;
+            if (!VTOLMPUtils.IsMultiplayer())
+            {
+                newPolaroid = Instantiate(polaroidObject, polaroidParent);
+            }
+            else
+            {
+                var polaroidInstantiateRequest = VTNetworkManager.NetInstantiate("DDA/PolaroidObj", Vector3.zero, Quaternion.identity, false);
+                while (!polaroidInstantiateRequest.isReady)
+                    yield return null;
+                
+                newPolaroid = polaroidInstantiateRequest.obj;
+                newPolaroid.transform.parent = polaroidParent;
+            }
+
             var polaroidTransform = newPolaroid.transform;
             polaroidTransform.localPosition = Vector3.zero;
             polaroidTransform.localRotation = Quaternion.identity;
 
             newPolaroid.SetActive(true);
-        
-            lastPolaroid = newPolaroid.GetComponentInChildren<PolaroidObject>();
-            
-            // Create and set the polaroids RT.
-            lastPolaroid.polaroidMaterial = lastPolaroid.renderer.materials[lastPolaroid.materialIndex];
 
-            lastPolaroid.renderTexture = new RenderTexture(lastPolaroid.renderTexture);
-            lastPolaroid.polaroidMaterial.mainTexture = lastPolaroid.renderTexture;
-            
+            _lastPolaroid = newPolaroid.GetComponentInChildren<PolaroidObject>();
+
+            // Create and set the polaroids RT.
+            _lastPolaroid.polaroidMaterial = _lastPolaroid.renderer.materials[_lastPolaroid.materialIndex];
+            if (!remote)
+            {
+                _lastPolaroid.renderTexture = new RenderTexture(_lastPolaroid.renderTexture);
+                _lastPolaroid.polaroidMaterial.mainTexture = _lastPolaroid.renderTexture;
+            }
+            else
+            {
+                _lastPolaroid.polaroidMaterial.mainTexture = remoteTexture;
+            }
+
             // Set rootTf for the polaroid to set to after yoinked and then do the polaroid nyoom out
-            lastPolaroid.rootTf = transform;
-        
-            lastPolaroid.translationToggle.SetDeployed();
+            _lastPolaroid.rootTf = transform;
+
+            _lastPolaroid.translationToggle.SetDeployed();
         }
     }

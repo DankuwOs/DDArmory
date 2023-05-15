@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 	public class HPEquipSGHandHeld : HPEquipSG
@@ -17,8 +18,6 @@ using UnityEngine.Events;
 			_held = true;
 			controller.OnThumbButtonPressed += Ctrlr_OnThumbButtonPressed;
 			controller.OnThumbButtonReleased += Ctrlr_OnThumbButtonReleased;
-			
-			
 		}
 
 		public void StopHolding(VRHandController controller)
@@ -26,6 +25,14 @@ using UnityEngine.Events;
 			_held = false;
 			controller.OnThumbButtonPressed -= Ctrlr_OnThumbButtonPressed;
 			controller.OnThumbButtonReleased -= Ctrlr_OnThumbButtonReleased;
+			
+			var laserObject = new LaserObjectSync
+			{
+				enabled = false,
+				laserEnd = Vector3D.zero,
+				laserStart = Vector3.zero,
+				laserLightPos = Vector3D.zero
+			};
 		}
 
 		protected override Vector3 GetTargetPosition(OpticalTargeter targeter)
@@ -42,23 +49,23 @@ using UnityEngine.Events;
 				laserRenderer.SetPositions(positions);
 				pointLight.transform.position = raycastHit.point + raycastHit.normal * 0.01f;
 				result = raycastHit.point;
+				if (OnSetLaser != null)
+				{
+					var laserObject = new LaserObjectSync
+					{
+						enabled = true,
+						laserEnd = VTMapManager.WorldToGlobalPoint(raycastHit.point),
+						laserStart = Vector3.zero,
+						laserLightPos = VTMapManager.WorldToGlobalPoint(raycastHit.point + raycastHit.normal * 0.01f)
+					};
+					OnSetLaser.Invoke(laserObject);
+				}
 			}
 			else
 			{
 				result = turret.transform.forward * 8000f;
 			}
 			return result;
-		}
-
-		public override void FixedUpdate()
-		{
-			base.FixedUpdate();
-			var held = _held;
-			if (!held)
-			{
-				laser.localPosition = Vector3.Lerp(laser.localPosition, returnVector, returnSpeed * Time.deltaTime);
-				laser.localRotation = Quaternion.Lerp(laser.localRotation, Quaternion.identity, returnSpeed * 2f * Time.deltaTime);
-			}
 		}
 
 		public void Ctrlr_OnThumbButtonPressed(VRHandController controller)
@@ -82,17 +89,21 @@ using UnityEngine.Events;
 
 		public VRInteractable interactable;
 
-		public float returnSpeed = 10f;
-
-		public Transform laser;
-
-		public Vector3 returnVector;
-
 		public Light pointLight;
+		
+		public event Action<LaserObjectSync> OnSetLaser;
 
 		public UnityEvent ThumbButtonDown = new UnityEvent();
 
 		public UnityEvent ThumbButtonUp = new UnityEvent();
 
 		private bool _held;
+		
+		public class LaserObjectSync
+		{
+			public Vector3 laserStart;
+			public Vector3D laserEnd;
+			public Vector3D laserLightPos;
+			public bool enabled;
+		}
 	}

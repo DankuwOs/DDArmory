@@ -27,7 +27,6 @@ public class FloatySync : VTNetSyncRPCOnly
     [VTRPC]
     public void RPC_DeployFloaty(int deploy)
     {
-        var flag = deploy == 1;
         if (!isMine)
         {
             if (deploy == 1)

@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
-	public class HPEquipSG : HPEquipGun, IMassObject
+public class HPEquipSG : HPEquipGun, IMassObject
 	{
 		protected override void OnEquip()
 		{
@@ -73,7 +74,7 @@ using UnityEngine.Events;
 		
 			if (gun.isFiring)
 			{
-				CamRigRotationInterpolator.ShakeAll(-this.transform.up * 0.3f);
+				CamRigRotationInterpolator.ShakeAll(Random.onUnitSphere * shakeMagnitude);
 			}
 		}
 

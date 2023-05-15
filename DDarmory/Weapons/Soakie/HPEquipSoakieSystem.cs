@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
@@ -7,7 +8,6 @@ using Random = System.Random;
 	{
 		protected override void OnEquip()
 		{
-			base.OnEquip();
 			if (weaponManager)
 			{
 				_battery = weaponManager.battery;
@@ -27,6 +27,22 @@ using Random = System.Random;
 			
 
 				SetTransforms();
+			}
+		}
+
+		public override void OnDestroy()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
+			}
+		}
+
+		public override void OnUnequip()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
 			}
 		}
 

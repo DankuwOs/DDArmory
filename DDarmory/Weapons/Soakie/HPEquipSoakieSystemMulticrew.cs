@@ -23,6 +23,22 @@ using UnityEngine;
 				SetTransforms();
 			}
 		}
+		
+		public override void OnDestroy()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
+			}
+		}
+
+		public override void OnUnequip()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
+			}
+		}
 
 		public void SetTransforms()
 		{

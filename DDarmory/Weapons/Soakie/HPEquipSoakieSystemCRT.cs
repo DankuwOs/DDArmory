@@ -5,7 +5,6 @@ using UnityEngine;
 	{
 		protected override void OnEquip()
 		{
-			base.OnEquip();
 			if (!weaponManager) return;
 		
 			_battery = weaponManager.battery;
@@ -22,6 +21,22 @@ using UnityEngine;
 				}
 			}
 			SetTransforms();
+		}
+		
+		public override void OnDestroy()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
+			}
+		}
+
+		public override void OnUnequip()
+		{
+			foreach (var armorTf in armorTfs)
+			{
+				DestroyImmediate(armorTf);
+			}
 		}
 
 		public void SetTransforms()

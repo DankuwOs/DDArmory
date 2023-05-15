@@ -23,6 +23,8 @@
 
         public float lifetime;
 
+        [HideInInspector] public bool isRemote;
+
         [HideInInspector]
         public Transform rootTf;
 

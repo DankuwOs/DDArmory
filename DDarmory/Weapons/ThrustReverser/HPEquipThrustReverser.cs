@@ -1,4 +1,5 @@
 ﻿using System;
+using Harmony;
 using UnityEngine;
 
 public class HPEquipThrustReverser : HPEquippable, IMassObject
@@ -23,8 +24,7 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
 
     private ReverserState _state = ReverserState.Off;
 
-    [HideInInspector]
-    public ModuleEngine[] engines;
+    private ModuleEngine[] engines;
     
     private bool _deployed;
 
@@ -44,8 +44,6 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
         vcm.throttle.OnTriggerAxis.AddListener(TriggerAxis);
 
         _state = defaultState;
-        
-        Debug.Log($"[Thrust Reversers]: Engine count: {engines.Length} | VCM Throttle: {vcm.throttle.gameObject} | State: {_state}");
     }
 
     private void TriggerAxis(float axis)
@@ -69,7 +67,6 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
 
     public void SetReverserState(Int32 state)
     {
-        Debug.Log($"[ThrustReversers]: Set state: {state}");
         _state = (ReverserState)state;
         switch (state)
         {
@@ -83,6 +80,26 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(state), state, null);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (engines == null || engines.Length == 0)
+            return;
+
+        foreach (var moduleEngine in engines)
+        {
+            var animTime = animationToggle.GetT();
+
+
+            if (animTime <= 0.05f)
+                return;
+
+            var moduleEngineTraverse = Traverse.Create(moduleEngine);
+
+            moduleEngineTraverse.Property("finalThrust")
+                .SetValue(moduleEngine.finalThrust * reverserCurve.Evaluate(animTime));
         }
     }
 

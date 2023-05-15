@@ -17,8 +17,7 @@ public class HPEquipFloaty : HPEquippable, IMassObject
             _vehicleInputManager = weaponManager.GetComponent<VehicleInputManager>();
             _flightInfo = weaponManager.actor.flightInfo;
         }
-
-        Debug.Log(string.Format("{0} | {1} | {2}", weaponManager.gameObject, _flightInfo, _vehicleInputManager));
+        
         SetDrag(waterBuoyancies, baseDrag);
         if (usingWheels) StartWheels();
     }

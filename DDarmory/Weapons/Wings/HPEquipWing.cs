@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using VTOLVR.Multiplayer;
 
-[RequireComponent(typeof(SwingWingController))]
+[RequireComponent(typeof(WingController))]
 public class HPEquipWing : HPEquippable, IMassObject
 {
     public float mass = 0.25f;
@@ -22,32 +22,40 @@ public class HPEquipWing : HPEquippable, IMassObject
     public WingController controller;
 
     [Tooltip("List of hardpoints, goes this (Modified HP, Parent of HP, Position, Rotation)")] 
-    private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
+    private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new();
+
+    private VehiclePart[] _myParts;
+
+    private VehiclePart[] _vanillaParts;
 
     protected override void OnEquip()
     {
-        base.OnEquip();
-
         Initialize();
     }
-
-    public override void OnConfigAttach(LoadoutConfigurator configurator)
+    
+    public override void OnUnequip()
     {
-        base.OnConfigAttach(configurator);
-        if (configurator.uiOnly)
+        if (!weaponManager)
             return;
         
-        Initialize(configurator);
-    }
-
-    public override void OnConfigDetach(LoadoutConfigurator configurator)
-    {
-        if (configurator.uiOnly)
-            return;
-
         foreach (var disableObject in disableObjects)
         {
-            ToggleObject(disableObject, configurator.wm, true);
+            ToggleObject(disableObject, weaponManager, true);
+        }
+        
+        if (VTOLMPUtils.IsMultiplayer())
+        {
+            var playerVehicleNetSync = weaponManager.GetComponent<PlayerVehicleNetSync>();
+            if (playerVehicleNetSync)
+            {
+                var parts = playerVehicleNetSync.vehicleParts.ToList();
+                foreach (var vehiclePart in parts)
+                {
+                    if (_myParts.Contains(vehiclePart))
+                        parts.Remove(vehiclePart);
+                }
+                playerVehicleNetSync.vehicleParts = parts.ToArray();
+            }
         }
 
         if (hpTransforms.Count > 0)
@@ -63,8 +71,67 @@ public class HPEquipWing : HPEquippable, IMassObject
                 }
             }
         }
+    }
+
+    public override void OnConfigAttach(LoadoutConfigurator configurator)
+    {
+        base.OnConfigAttach(configurator);
+        if (configurator.uiOnly)
+            return;
+
+        foreach (var i in detachHpIdx)
+        {
+            if (configurator.hpNodes[i])
+                ToggleNode(configurator.hpNodes[i].gameObject);
+        }
         
-        base.OnConfigDetach(configurator);
+        Initialize(configurator);
+    }
+
+    public override void OnConfigDetach(LoadoutConfigurator configurator)
+    {
+        if (configurator.uiOnly)
+            return;
+        
+        foreach (var i in detachHpIdx)
+        {
+            if (configurator.hpNodes[i])
+                ToggleNode(configurator.hpNodes[i].gameObject, false);
+        }
+
+        foreach (var disableObject in disableObjects)
+        {
+            ToggleObject(disableObject, configurator.wm, true);
+        }
+        
+        if (VTOLMPUtils.IsMultiplayer())
+        {
+            var playerVehicleNetSync = configurator.wm.GetComponent<PlayerVehicleNetSync>();
+            if (playerVehicleNetSync)
+            {
+                var parts = playerVehicleNetSync.vehicleParts.ToList();
+                foreach (var vehiclePart in parts)
+                {
+                    if (_myParts.Contains(vehiclePart))
+                        parts.Remove(vehiclePart);
+                }
+                playerVehicleNetSync.vehicleParts = parts.ToArray();
+            }
+        }
+
+        if (hpTransforms.Count > 0)
+        {
+            foreach (var hpTransform in hpTransforms)
+            {
+                if (hpTransform.Item1 && hpTransform.Item2)
+                {
+                    var tf = hpTransform.Item1;
+                    tf.SetParent(hpTransform.Item2);
+                    tf.localPosition = hpTransform.Item3;
+                    tf.localRotation = hpTransform.Item4;
+                }
+            }
+        }
     }
 
     public virtual void Initialize(LoadoutConfigurator configurator = null)
@@ -74,24 +141,22 @@ public class HPEquipWing : HPEquippable, IMassObject
         var vesselVehiclePart = wm.GetComponent<VehiclePart>();
         var aeroController = wm.GetComponent<AeroController>();
 
-        // Old objects are still present in lists and cause nullrefs, this fixes that while also adding our own objects.
+        _myParts = GetComponentsInChildren<VehiclePart>(true);
+
         if (VTOLMPUtils.IsMultiplayer())
         {
             var playerVehicleNetSync = wm.GetComponent<PlayerVehicleNetSync>();
             if (playerVehicleNetSync)
             {
-                var list = wm.GetComponentsInChildren<VehiclePart>();
-
-                playerVehicleNetSync.vehicleParts = list;
+                _vanillaParts = playerVehicleNetSync.vehicleParts;
+                var parts = _vanillaParts.ToList();
+                parts.Add(_myParts);
+                playerVehicleNetSync.vehicleParts = parts.ToArray();
             }
-            
-            var damageSync = wm.GetComponent<DamageSync>();
+
+            var damageSync = GetComponent<DamageSync>();
             if (damageSync)
-            {
-                var list = wm.GetComponentsInChildren<Health>();
-
-                damageSync.healths = list;
-            }
+                damageSync.actor = wm.actor;
         }
 
         // Assign parent to the vehicle parts for reasons
@@ -131,8 +196,6 @@ public class HPEquipWing : HPEquippable, IMassObject
                 aeroController.controlSurfaces[i].Init();
             }
         }
-        
-        
 
         // Moving hardpoints to my own
 
@@ -172,18 +235,17 @@ public class HPEquipWing : HPEquippable, IMassObject
         {
             ToggleObject(disableObject, wm);
         }
-        
-        
+
         foreach (var wing in GetComponentsInChildren<Wing>(true))
         {
-            wing.rb = wm.vesselRB;
+            wing.SetParentRigidbody(wm.vesselRB);
             wing.enabled = true;
         }
 
         var flightInfo = wm.actor.flightInfo;
         
         // Set up wing vapor
-        foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>())
+        foreach (var wingVaporParticles in GetComponentsInChildren<WingVaporParticles>(true))
         {
             wingVaporParticles.flightInfo = flightInfo;
         }
@@ -211,6 +273,23 @@ public class HPEquipWing : HPEquippable, IMassObject
         }
         
         t.gameObject.SetActive(enable);
+    }
+
+    private void ToggleNode(GameObject obj, bool cull = true)
+    {
+        var renderers = obj.GetComponentsInChildren<Renderer>();
+        var canvasRenderers = obj.GetComponentsInChildren<CanvasRenderer>();
+        var vrInt = obj.GetComponentInChildren<VRInteractable>();
+        vrInt.enabled = !cull;
+        foreach (var renderer in renderers)
+        {
+            renderer.enabled = !cull;
+        }
+
+        foreach (var canvasRenderer in canvasRenderers)
+        {
+            canvasRenderer.cull = cull;
+        }
     }
 
     public override int GetMaxCount()

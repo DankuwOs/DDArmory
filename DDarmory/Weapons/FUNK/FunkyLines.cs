@@ -39,7 +39,7 @@ public class FunkyLines : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (stopFixedUpdate)
+        if (stopFixedUpdate || !tgt)
             return;
         
         _i++;
