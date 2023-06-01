@@ -11,6 +11,10 @@ public class WingController : MonoBehaviour
     [Tooltip("Path to a VRLever separated by a '/'")]
     public string navSwitchPath;
 
+    public string wingFoldPath;
+
+    public RotationToggle wingFoldToggle;
+
     [Header("Ext. Lights")] 
     public StrobeLightController.StrobeLight[] strobeLights;
 
@@ -34,14 +38,14 @@ public class WingController : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[Wing Controller]: No flight info. :~(");
+            Debug.Log($"[Wing Controller (SL)]: No flight info. :~(");
             return;
         }
         
         
         if (!battery)
         {
-            Debug.Log($"[Wing Controller]: Battery gone!");
+            Debug.Log($"[Wing Controller (SL)]: Battery gone!");
             return;
         }
 
@@ -90,5 +94,29 @@ public class WingController : MonoBehaviour
         {
             strobeController.lights.AddRange(strobeLights);
         }
+    }
+
+    public virtual void SetupWingFold()
+    {
+        Transform startTf = null;
+        if (flightInfo)
+        {
+            startTf = flightInfo.transform;
+        }
+        else
+        {
+            Debug.Log($"[Wing Controller (WF)]: flightInfo null!");
+            return;
+        }
+
+        var wfSwitch = FindTransform.FindTranny(startTf, wingFoldPath)?.GetComponent<VRLever>();
+        if (!wfSwitch)
+            return;
+        if (battery)
+            wingFoldToggle.battery = battery;
+        wfSwitch.OnSetState.AddListener(delegate(int state)
+        {
+            wingFoldToggle.SetState(state);
+        });
     }
 }

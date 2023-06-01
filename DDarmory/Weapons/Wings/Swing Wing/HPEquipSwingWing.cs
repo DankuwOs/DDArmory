@@ -6,8 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(SwingWingController))]
 public class HPEquipSwingWing : HPEquipWing
 {
-    public float mass = 0.25f;
-
     [Header("Swing Wing")]
 
     [Range(0, 1)] public float defaultSweep = 0;

@@ -156,7 +156,9 @@
         <Compile Include="Weapons\Utils\GrabInteractable.cs" />
         <Compile Include="Weapons\Utils\MultiEquipCockpitElement.cs" />
         <Compile Include="Weapons\Utils\WingVesselRB.cs" />
+        <Compile Include="Weapons\Wings\CV Wings\HPEquipCVWing.cs" />
         <Compile Include="Weapons\Wings\HPEquipWing.cs" />
+        <Compile Include="Weapons\Wings\OPFOR Wings\HPEquipOPFORWing.cs" />
         <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepBar.cs" />
         <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepDisplay.cs" />
         <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepMode.cs" />
@@ -172,6 +174,6 @@
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <PostBuildEvent>copy "$(TargetPath)" "D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\VTOLVR_ModLoader\projects\My Mods\DDArmory\Builds\DDArmory.dll"
-copy "$(TargetPath)" "D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.5.4 L2 - ReImport\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll"</PostBuildEvent>
+copy "$(TargetPath)" "D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.6.1\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll"</PostBuildEvent>
     </PropertyGroup>
 </Project>

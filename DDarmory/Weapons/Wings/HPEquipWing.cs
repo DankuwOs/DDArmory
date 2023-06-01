@@ -216,6 +216,14 @@ public class HPEquipWing : HPEquippable, IMassObject
                 wmHp.SetParent(hardpoint);
                 wmHp.localPosition = Vector3.zero;
                 wmHp.localRotation = Quaternion.identity;
+
+                // Adding some code for stuff so equips (hopefully) jettison when hp dies.
+                
+                if (!hardpoint.GetComponent<VehiclePart>()) continue;
+                
+                var hpVp = hardpoint.gameObject.AddComponent<HardpointVehiclePart>();
+                hpVp.wm = wm;
+                hpVp.hpIdx = index;
             }
         }
 
