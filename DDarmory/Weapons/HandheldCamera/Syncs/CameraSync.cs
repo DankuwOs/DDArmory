@@ -49,6 +49,9 @@ public class CameraSync : VTNetSyncRPCOnly
         if (!isMine)
         {
             camera.OnCapture.Invoke();
+            
+            // Dont do it in an event for some reason, so do it here.
+            camera.RemoteFlash();
         }
     }
     

@@ -86,8 +86,6 @@ namespace DDArmory.Weapons.Wings.OPFOR_Wings
                 tf.localPosition = vertStabPositions[i];
                 tf.localRotation = tf.localRotation = Quaternion.Euler(vertStabRotations[i]);
             }
-            
-            controller.SetupWingFold();
         }
     }
 }

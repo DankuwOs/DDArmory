@@ -46,6 +46,8 @@ using UnityEngine.Rendering;
 
         private Coroutine _screenshotRoutine;
 
+        private Coroutine _flashRoutine;
+
         private string _imageDirectory;
 
         private DirectoryInfo _imageDirectoryInfo;
@@ -158,7 +160,7 @@ using UnityEngine.Rendering;
             {
                 OnCapture.Invoke();
 
-                Screenshot();
+                yield return StartCoroutine(Screenshot());
 
                 imagesTaken.AddToCount();
 
@@ -169,10 +171,14 @@ using UnityEngine.Rendering;
             _screenshotRoutine = null;
         }
 
-        public virtual void Screenshot()
+        public virtual IEnumerator Screenshot()
         {
             if (flashObject && _flashEnabled)
-                StartCoroutine(FlashRoutine());
+            {
+                if (_flashRoutine != null)
+                    StopCoroutine(_flashRoutine);
+                _flashRoutine = StartCoroutine(FlashRoutine());
+            }
 
             var renderTexture =
                 RenderTexture.GetTemporary((int)resolution.x, (int)resolution.y, 0, GraphicsFormat.R8G8B8A8_SRGB);
@@ -188,6 +194,8 @@ using UnityEngine.Rendering;
             camera.targetTexture = prevTexture;
 
             RenderTexture.ReleaseTemporary(renderTexture);
+            
+            yield break;
         }
 
         private void OnCompleteReadback(AsyncGPUReadbackRequest readbackRequest)
@@ -246,6 +254,17 @@ using UnityEngine.Rendering;
         public void SetFov(float input)
         {
             camera.fieldOfView = fieldOfView.Lerp(input);
+        }
+
+        public void RemoteFlash()
+        {
+            if (!_flashEnabled || !flashObject)
+                return;
+
+            
+            if (_flashRoutine != null)
+                StopCoroutine(_flashRoutine);
+            _flashRoutine = StartCoroutine(FlashRoutine());
         }
 
         private IEnumerator FlashRoutine()

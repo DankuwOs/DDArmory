@@ -28,7 +28,7 @@ using UnityEngine;
 		{
 			foreach (var armorTf in armorTfs)
 			{
-				DestroyImmediate(armorTf);
+				DestroyImmediate(armorTf.gameObject);
 			}
 		}
 
@@ -36,7 +36,7 @@ using UnityEngine;
 		{
 			foreach (var armorTf in armorTfs)
 			{
-				DestroyImmediate(armorTf);
+				DestroyImmediate(armorTf.gameObject);
 			}
 		}
 

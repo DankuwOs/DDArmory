@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using VTNetworking;
 using VTOLVR.Multiplayer;
 
@@ -12,22 +13,29 @@ public class HPEquipPolaroid : HPEquipHandheldCamera
 
         public Transform polaroidParent;
 
-        public Texture remoteTexture;
+        public PolaroidSync polaroidSync;
+        
 
         private PolaroidObject _lastPolaroid;
 
         [HideInInspector]
         public bool remote;
 
-        public override void Screenshot()
+        public override IEnumerator Screenshot()
         {
-            base.Screenshot();
+            yield return base.Screenshot();
             
-            StartCoroutine(SendPolaroid());
+            yield return StartCoroutine(SendPolaroid());
+            
             if (remote)
-                return;
+                yield break;
             
             var prevTexture = camera.targetTexture;
+
+            if (!_lastPolaroid)
+            {
+                Debug.Log($"[HPEquipPolaroid]: ??!? _lastPolaroid null!?!?!? OWO");
+            }
             
             camera.targetTexture = _lastPolaroid.renderTexture;
             camera.Render();
@@ -44,12 +52,15 @@ public class HPEquipPolaroid : HPEquipHandheldCamera
             }
             else
             {
-                var polaroidInstantiateRequest = VTNetworkManager.NetInstantiate("DDA/PolaroidObj", Vector3.zero, Quaternion.identity, false);
+                var polaroidInstantiateRequest =
+                    VTNetworkManager.NetInstantiate("DDA/PolaroidObj", Vector3.zero, Quaternion.identity, false);
                 while (!polaroidInstantiateRequest.isReady)
                     yield return null;
-                
+
                 newPolaroid = polaroidInstantiateRequest.obj;
                 newPolaroid.transform.parent = polaroidParent;
+
+                polaroidSync.SendRPC("RPC_SendPolaroid", newPolaroid.GetComponent<VTNetEntity>().entityID);
             }
 
             var polaroidTransform = newPolaroid.transform;
@@ -62,15 +73,9 @@ public class HPEquipPolaroid : HPEquipHandheldCamera
 
             // Create and set the polaroids RT.
             _lastPolaroid.polaroidMaterial = _lastPolaroid.renderer.materials[_lastPolaroid.materialIndex];
-            if (!remote)
-            {
-                _lastPolaroid.renderTexture = new RenderTexture(_lastPolaroid.renderTexture);
-                _lastPolaroid.polaroidMaterial.mainTexture = _lastPolaroid.renderTexture;
-            }
-            else
-            {
-                _lastPolaroid.polaroidMaterial.mainTexture = remoteTexture;
-            }
+            
+            _lastPolaroid.renderTexture = new RenderTexture(_lastPolaroid.renderTexture);
+            _lastPolaroid.polaroidMaterial.mainTexture = _lastPolaroid.renderTexture;
 
             // Set rootTf for the polaroid to set to after yoinked and then do the polaroid nyoom out
             _lastPolaroid.rootTf = transform;

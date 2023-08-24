@@ -88,6 +88,9 @@
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule">
+          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.UI">
           <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UI.dll</HintPath>
         </Reference>
@@ -127,6 +130,7 @@
         <Compile Include="Weapons\GunTrim\GunTrim.cs" />
         <Compile Include="Weapons\HandheldCamera\Polaroid\HPEquipPolaroid.cs" />
         <Compile Include="Weapons\HandheldCamera\Polaroid\PolaroidObject.cs" />
+        <Compile Include="Weapons\HandheldCamera\Polaroid\Syncs\PolaroidObjectSync.cs" />
         <Compile Include="Weapons\HandheldCamera\Polaroid\Syncs\PolaroidSync.cs" />
         <Compile Include="Weapons\HandheldCamera\Syncs\CameraSync.cs" />
         <Compile Include="Weapons\HandheldCamera\Text Scripts\DriveUsage.cs" />
@@ -155,6 +159,8 @@
         <Compile Include="Weapons\Utils\FindTransform.cs" />
         <Compile Include="Weapons\Utils\GrabInteractable.cs" />
         <Compile Include="Weapons\Utils\MultiEquipCockpitElement.cs" />
+        <Compile Include="Weapons\Utils\PID\FloatAdjuster.cs" />
+        <Compile Include="Weapons\Utils\PID\PIDFixer.cs" />
         <Compile Include="Weapons\Utils\WingVesselRB.cs" />
         <Compile Include="Weapons\Wings\CV Wings\HPEquipCVWing.cs" />
         <Compile Include="Weapons\Wings\HPEquipWing.cs" />

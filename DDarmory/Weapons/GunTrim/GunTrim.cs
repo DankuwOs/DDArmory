@@ -24,7 +24,6 @@ public class GunTrim : MultiEquipCockpitElement
     public void SetTrim(Int32 trim)
     {
         enableTrim = trim != 0;
-        Debug.Log($"[DD GunTrim]: Set trim {enableTrim}");
     }
 
     public override void Start()
@@ -66,13 +65,11 @@ public class GunTrim : MultiEquipCockpitElement
 
     private IEnumerator GetCount(GameObject cockpitObj)
     {
-        Debug.Log("[DD GunTrim]: 1");
         // Wait for all the weapons to be equipped
         yield return null;
         
         var wm = gun.actor.weaponManager;
-        Debug.Log("[DD GunTrim]: 2");
-
+        
         List<HPEquippable> equips = new List<HPEquippable>();
         for (int i = 0; i < wm.equipCount; i++)
         {
@@ -81,20 +78,13 @@ public class GunTrim : MultiEquipCockpitElement
 
         foreach (var equip in equips)
         {
-            Debug.Log("[DD GunTrim]: A");
             var gunTrim = equip.GetComponentInChildren<GunTrim>();
-            Debug.Log("[DD GunTrim]: B");
             if (!gunTrim || gunTrim.cockpitObject.name != cockpitObj.name)
             {
-                if (gunTrim)
-                    Debug.Log($"[DD GunTrim]: CockpitObj = {gunTrim.cockpitObject.name} | Other = {cockpitObj.name}");
                 continue;
             }
-            Debug.Log("[DD GunTrim]: C");
             count++;
         }
-
-        Debug.Log($"[DD GunTrim]: Count = {count}");
     }
 
     private void FixedUpdate()
@@ -104,7 +94,7 @@ public class GunTrim : MultiEquipCockpitElement
 
         var infoTraverse = Traverse.Create(_flightAssist);
         var trimAmount = trimCurve.Evaluate(gun.actor.flightInfo.airspeed) * count;
-        Debug.Log($"[DD GunTrim]: Amt = {trimAmount}");
+        
         infoTraverse.Field("takeOffTrimAmt").SetValue(invert ? -trimAmount : trimAmount);
     }
 }

@@ -34,7 +34,7 @@ using Random = System.Random;
 		{
 			foreach (var armorTf in armorTfs)
 			{
-				DestroyImmediate(armorTf);
+				DestroyImmediate(armorTf.gameObject);
 			}
 		}
 
@@ -42,7 +42,7 @@ using Random = System.Random;
 		{
 			foreach (var armorTf in armorTfs)
 			{
-				DestroyImmediate(armorTf);
+				DestroyImmediate(armorTf.gameObject);
 			}
 		}
 

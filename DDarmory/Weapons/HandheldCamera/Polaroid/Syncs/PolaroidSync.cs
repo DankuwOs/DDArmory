@@ -3,6 +3,8 @@ using VTNetworking;
 
 public class PolaroidSync : CameraSync
 {
+    public Texture remoteTexture;
+    
     protected override void OnNetInitialized()
     {
         base.OnNetInitialized();
@@ -19,19 +21,53 @@ public class PolaroidSync : CameraSync
             var obj = Instantiate(polaroid.polaroidObject);
             DontDestroyOnLoad(obj);
             VTNetworkManager.RegisterOverrideResource("DDA/PolaroidObj", obj);
+            obj.SetActive(false);
         }
 
         polaroid.remote = !isMine;
     }
 
     [VTRPC]
+    public void RPC_SendPolaroid(int id)
+    {
+        if (isMine)
+            return;
+        var entity = VTNetworkManager.instance.GetEntity(id);
+        if (!entity)
+        {
+            Debug.Log($"[PolaroidSync.SendPolaroid]: Entity null!");
+        }
+
+        var polaroidObj = entity.gameObject;
+
+        var polaroidTransform = polaroidObj.transform;
+
+        polaroidTransform.parent = ((HPEquipPolaroid)camera).polaroidParent;
+        polaroidTransform.localPosition = Vector3.zero;
+        polaroidTransform.localRotation = Quaternion.identity;
+
+        polaroidObj.SetActive(true);
+
+        var polaroid = polaroidObj.GetComponentInChildren<PolaroidObject>();
+
+        // Create and set the polaroids RT.
+        polaroid.polaroidMaterial = polaroid.renderer.materials[polaroid.materialIndex];
+        
+        polaroid.polaroidMaterial.mainTexture = remoteTexture;
+
+        // Set rootTf for the polaroid to set to after yoinked and then do the polaroid nyoom out
+        polaroid.rootTf = transform;
+
+        polaroid.translationToggle.SetDeployed();
+    }
+    
+
+    [VTRPC]
     public override void RPC_CameraOnCapture()
     {
-        Debug.Log($"Running polaroid RPC");
         if (!isMine)
         {
-            Debug.Log($"Sending polaroid object");
-            StartCoroutine(((HPEquipPolaroid)camera).SendPolaroid());
+            Debug.Log($"Running polaroid RPC for other player");
             camera.OnCapture.Invoke();
         }
     }

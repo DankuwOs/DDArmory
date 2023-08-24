@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
-    public class PolaroidObject : MonoBehaviour
+public class PolaroidObject : MonoBehaviour
     {
         public VRInteractable interactable;
 
@@ -30,6 +31,10 @@
 
         [HideInInspector]
         public Material polaroidMaterial;
+
+
+        public UnityEvent OnYoinked = new();
+        
 
         private Vector3 lastPosition;
 
@@ -84,6 +89,8 @@
         {
             if (yoinked)
                 return;
+            
+            OnYoinked.Invoke();
 
             yoinked = true;
             transform.SetParent(rootTf, true);
