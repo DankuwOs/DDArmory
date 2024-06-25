@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class HPEquipSG : HPEquipGun, IMassObject
 	{
-		protected override void OnEquip()
+		public override void OnEquip()
 		{
 			base.OnEquip();
 			_windingWeapon = GetComponent<WindingWeapon>();

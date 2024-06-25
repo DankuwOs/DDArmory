@@ -3,7 +3,7 @@ using VTNetworking;
 
 public class WingsSync : VTNetSyncRPCOnly
 {
-    protected override void OnNetInitialized()
+    public override void OnNetInitialized()
     {
         var flag = netEntity == null;
         if (flag) Debug.LogError("WingsSync has no netEntity!");

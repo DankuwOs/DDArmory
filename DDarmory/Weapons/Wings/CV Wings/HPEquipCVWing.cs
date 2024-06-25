@@ -61,35 +61,50 @@ namespace DDArmory.Weapons.Wings.CV_Wings
         public override void OnUnequip()
         {
             base.OnUnequip();
-
+            Debug.Log($"A");
             var vehicleInputManager = weaponManager.GetComponent<VehicleInputManager>();
+            Debug.Log($"B");
             vehicleInputManager.tiltController = _tiltController;
             
+            Debug.Log($"C");
             foreach (var vaporObject in wingVaporParticles)
             {
+                Debug.Log($"C1");
                 var tf = weaponManager.transform.Find(vaporObject);
                     
+                Debug.Log($"C2");
                 if (!tf || !tf.gameObject.GetComponent<WingVaporParticles>())
                     continue;
 
+                Debug.Log($"C3");
                 var vaporParticles = tf.gameObject.GetComponent<WingVaporParticles>();
+                Debug.Log($"C4");
                 vaporParticles.StopCoroutine(vaporParticles.UpdateRoutine());
+                Debug.Log($"C5");
                 OnWillRenderObjectHost.GetHost(vaporParticles.renderHost).RegisterScript(vaporParticles);
+                Debug.Log($"C6");
             }
+            Debug.Log($"D");
             
             var switchTf = weaponManager.transform.Find(canopySwitchPath);
 
+            Debug.Log($"E");
             if (!switchTf)
             {
+                Debug.Log($"F");
                 Debug.Log($"[CVWings_OnUnequip]: Switch tf null");
                 return;
             }
+            Debug.Log($"G");
 
             _canopyLever = switchTf.GetComponent<VRLever>();
+            Debug.Log($"H");
             
             _canopyLever.OnSetState.RemoveListener(SetCanopyState);
+            Debug.Log($"I");
             
             AudioController.instance.SetExteriorOpening($"canopy_{GetInstanceID()}", 0f);
+            Debug.Log($"J");
         }
         
 

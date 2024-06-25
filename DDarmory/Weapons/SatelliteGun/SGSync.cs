@@ -4,7 +4,7 @@ using VTNetworking;
 
 	public class SGSync : VTNetSyncRPCOnly
 	{
-		protected override void OnNetInitialized()
+		public override void OnNetInitialized()
 		{
 			if (netEntity == null)
 			{

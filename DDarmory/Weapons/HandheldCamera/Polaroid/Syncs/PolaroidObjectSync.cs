@@ -6,7 +6,7 @@ public class PolaroidObjectSync : VTNetSyncRPCOnly
 
     public PolaroidObject polaroidObject;
 
-    protected override void OnNetInitialized()
+    public override void OnNetInitialized()
     {
         base.OnNetInitialized();
 

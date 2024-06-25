@@ -5,8 +5,8 @@ using UnityEngine.Events;
 	public class HPEquipSGHandHeld : HPEquipSG
 	{
 		private int _previousEqIdx;
-		
-		protected override void Start()
+
+		public override void Start()
 		{
 			base.Start();
 			interactable.OnStartInteraction += StartHolding;

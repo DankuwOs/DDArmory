@@ -58,7 +58,7 @@ using UnityEngine.Rendering;
 
         private bool _saving;
 
-        protected override void OnEquip()
+        public override void OnEquip()
         {
             base.OnEquip();
 

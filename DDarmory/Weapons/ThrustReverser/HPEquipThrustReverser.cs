@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 public class HPEquipThrustReverser : HPEquippable, IMassObject
@@ -28,7 +28,7 @@ public class HPEquipThrustReverser : HPEquippable, IMassObject
     
     private bool _deployed;
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         base.OnEquip();
         

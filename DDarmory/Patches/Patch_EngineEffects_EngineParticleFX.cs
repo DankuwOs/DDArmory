@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
+
+namespace DDArmory.Patches;
 
 [HarmonyPatch(typeof(EngineEffects.EngineParticleFX), nameof(EngineEffects.EngineParticleFX.Evaluate))]
 public class Patch_EngineEffects_EngineParticleFX

@@ -1,7 +1,13 @@
 ﻿using System;
+using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DDArmory.Weapons.Utils;
+using HarmonyLib;
+using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Jobs;
 using VTOLVR.Multiplayer;
 
 [RequireComponent(typeof(WingController))]
@@ -11,7 +17,9 @@ public class HPEquipWing : HPEquippable, IMassObject
 
     [Header("Parts")]
     public AeroController.ControlSurfaceTransform[] controlSurfaces;
-    
+
+    private AeroController.ControlSurfaceTransform[] _originalSurfaces;
+
     [Tooltip("Transforms of hardpoints, leave empty if you dont want to change it. This object is also used for toggling on and off for the F45 and maybe other aircraft.")]
     public Transform[] hardpoints;
 
@@ -30,7 +38,9 @@ public class HPEquipWing : HPEquippable, IMassObject
 
     private VehiclePart[] _vanillaParts;
 
-    protected override void OnEquip()
+    private bool _initialized;
+
+    public override void OnEquip()
     {
         base.OnEquip();
         
@@ -43,7 +53,7 @@ public class HPEquipWing : HPEquippable, IMassObject
         
         if (!weaponManager)
             return;
-        
+
         foreach (var disableObject in disableObjects)
         {
             ToggleObject(disableObject, weaponManager, true);
@@ -55,11 +65,13 @@ public class HPEquipWing : HPEquippable, IMassObject
             if (playerVehicleNetSync)
             {
                 var parts = playerVehicleNetSync.vehicleParts.ToList();
+                
                 foreach (var vehiclePart in parts)
                 {
                     if (_myParts.Contains(vehiclePart))
                         parts.Remove(vehiclePart);
                 }
+
                 playerVehicleNetSync.vehicleParts = parts.ToArray();
             }
         }
@@ -78,11 +90,12 @@ public class HPEquipWing : HPEquippable, IMassObject
             }
         }
 
-        if (weaponManager.GetComponent<ExternalOptionalHardpoints>() is var e)
+        var externalOptionalHardpoints = weaponManager.GetComponent<ExternalOptionalHardpoints>();
+        if (externalOptionalHardpoints != null)
         {
             foreach (var hpModel in hpModels)
             {
-                foreach (var externalOptionalHardpoint in e.hardpoints)
+                foreach (var externalOptionalHardpoint in externalOptionalHardpoints.hardpoints)
                 {
                     if (externalOptionalHardpoint.hpIdx != hpModel.Item1)
                         continue;
@@ -90,7 +103,24 @@ public class HPEquipWing : HPEquippable, IMassObject
                     externalOptionalHardpoint.pylonModel = hpModel.Item2;
                 }
             }
-            e.Refresh();
+            externalOptionalHardpoints.Refresh();
+        }
+        
+        var aeroController = weaponManager.GetComponent<AeroController>();
+
+        if (aeroController && _originalSurfaces != null)
+        {
+            
+            aeroController.controlSurfaces = _originalSurfaces;
+            _originalSurfaces = null;
+
+            
+            foreach (var aeroControllerControlSurface in aeroController.controlSurfaces)
+            {
+                aeroControllerControlSurface.Init();
+            }
+            
+            DD_AeroControllerFix.AeroControllerFix(aeroController);
         }
 
 
@@ -119,7 +149,7 @@ public class HPEquipWing : HPEquippable, IMassObject
         
         if (configurator.uiOnly)
             return;
-        
+
         foreach (var i in detachHpIdx)
         {
             if (configurator.hpNodes[i])
@@ -160,11 +190,12 @@ public class HPEquipWing : HPEquippable, IMassObject
             }
         }
         
-        if (configurator.wm.GetComponent<ExternalOptionalHardpoints>() is var e)
+        var externalOptionalHardpoints = configurator.wm.GetComponent<ExternalOptionalHardpoints>();
+        if (externalOptionalHardpoints != null)
         {
             foreach (var hpModel in hpModels)
             {
-                foreach (var externalOptionalHardpoint in e.hardpoints)
+                foreach (var externalOptionalHardpoint in externalOptionalHardpoints.hardpoints)
                 {
                     if (externalOptionalHardpoint.hpIdx != hpModel.Item1)
                         continue;
@@ -172,9 +203,24 @@ public class HPEquipWing : HPEquippable, IMassObject
                     externalOptionalHardpoint.pylonModel = hpModel.Item2;
                 }
             }
-            e.Refresh();
+            externalOptionalHardpoints.Refresh();
         }
         
+        var aeroController = configurator.wm.GetComponent<AeroController>();
+
+        if (aeroController && _originalSurfaces != null)
+        {
+
+            aeroController.controlSurfaces = _originalSurfaces;
+            _originalSurfaces = null;
+            
+            foreach (var aeroControllerControlSurface in aeroController.controlSurfaces)
+            {
+                aeroControllerControlSurface.Init();
+            }
+            
+            DD_AeroControllerFix.AeroControllerFix(aeroController);
+        }
         
         var flightAssist = configurator.wm.GetComponent<FlightAssist>();
         controller.ResetPIDs(flightAssist);
@@ -182,6 +228,9 @@ public class HPEquipWing : HPEquippable, IMassObject
 
     public virtual void Initialize(LoadoutConfigurator configurator = null)
     {
+        if (_initialized)
+            return;
+        
         var wm = configurator ? configurator.wm : weaponManager;
 
         var vesselVehiclePart = wm.GetComponent<VehiclePart>();
@@ -216,17 +265,29 @@ public class HPEquipWing : HPEquippable, IMassObject
         
         if (aeroController)
         {
+            if (_originalSurfaces == null)
+            {
+                _originalSurfaces = new AeroController.ControlSurfaceTransform[aeroController.controlSurfaces.Length];
+
+                for (int i = 0; i < aeroController.controlSurfaces.Length; i++)
+                {
+                    _originalSurfaces[i] = aeroController.controlSurfaces[i];
+                }
+            }
+
             // Adding my own control surfaces to the existing ones.
 
             for (var i = 0; i < controlSurfaces.Length; i++)
             {
                 var controlSurfaceTransform = controlSurfaces[i];
+                
 
                 if (!controlSurfaceTransform.transform)
                     continue;
 
                 if (i < aeroController.controlSurfaces.Length)
                 {
+                        
                     aeroController.controlSurfaces[i] = controlSurfaceTransform;
                     
                     aeroController.controlSurfaces[i].Init(); // Need to init every time you change a control surface
@@ -241,6 +302,8 @@ public class HPEquipWing : HPEquippable, IMassObject
                 
                 aeroController.controlSurfaces[i].Init();
             }
+            
+            DD_AeroControllerFix.AeroControllerFix(aeroController);
         }
 
         // Moving hardpoints to my own
@@ -263,18 +326,21 @@ public class HPEquipWing : HPEquippable, IMassObject
                 hpTransforms.Add(new Tuple<Transform, Transform, Vector3, Quaternion>(wmHp, wmHp.parent,
                     wmHp.localPosition, wmHp.localRotation));
 
-                foreach (var externalOptionalHardpoint in externalOptionalHardpoints.hardpoints)
+                if (externalOptionalHardpoints)
                 {
-                    if (externalOptionalHardpoint.hpIdx != index)
-                        continue;
 
-                    hpModels.Add(new Tuple<int, GameObject>(index, externalOptionalHardpoint.pylonModel));
+                    foreach (var externalOptionalHardpoint in externalOptionalHardpoints.hardpoints)
+                    {
+                        if (externalOptionalHardpoint.hpIdx != index)
+                            continue;
 
-                    externalOptionalHardpoint.pylonModel = hardpoint.gameObject;
+                        hpModels.Add(new Tuple<int, GameObject>(index, externalOptionalHardpoint.pylonModel));
+
+                        externalOptionalHardpoint.pylonModel = hardpoint.gameObject;
+                    }
+                    externalOptionalHardpoints.Refresh();
                 }
-                
-                externalOptionalHardpoints.Refresh();
-                
+
                 wmHp.SetParent(hardpoint);
                 wmHp.localPosition = Vector3.zero;
                 wmHp.localRotation = Quaternion.identity;
@@ -325,10 +391,14 @@ public class HPEquipWing : HPEquippable, IMassObject
         controller.battery = wm.battery;
         controller.flightInfo = flightInfo;
         controller.SetupLights();
-        controller.SetupWingFold();
+        if (controller.wingFoldToggle && !string.IsNullOrEmpty(controller.wingFoldPath))
+            controller.SetupWingFold();
 
         var flightAssist = wm.GetComponent<FlightAssist>();
         controller.SetupPIDs(flightAssist);
+
+        
+        _initialized = true;
     }
 
     public void ToggleObject(string path, WeaponManager wm, bool enable = false)

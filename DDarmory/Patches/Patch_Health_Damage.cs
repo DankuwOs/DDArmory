@@ -1,4 +1,6 @@
-﻿using Harmony;
+﻿using HarmonyLib;
+
+namespace DDArmory.Patches;
 
 // Token: 0x02000011 RID: 17
 [HarmonyPatch(typeof(Hitbox), "Damage")]

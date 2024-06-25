@@ -15,7 +15,7 @@ public class HPEquipSwingWing : HPEquipWing
     [Tooltip("List of hardpoints, goes this (Modified HP, Parent of HP, Position, Rotation)")] 
     private List<Tuple<Transform, Transform, Vector3, Quaternion>> hpTransforms = new List<Tuple<Transform, Transform, Vector3, Quaternion>>();
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         base.OnEquip();
 

@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class HPEquipHeadTrackOML : HPEquipOpticalML
 {
-	protected override void OnEquip()
+	public override void OnEquip()
 	{
 		oml = (OpticalMissileLauncher)ml;
 		var joysticks = weaponManager.GetComponent<VehicleControlManifest>().joysticks;

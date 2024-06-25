@@ -17,7 +17,7 @@ public class HPEquipLaserWings : HPEquippable, IMassObject
         baseRadarCrossSection = 0f;
     }
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         _wm = weaponManager;
         var myTeam = getTeam.GetMyTeam();

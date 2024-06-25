@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 public class HPEquipEngine : HPEquippable, IMassObject
@@ -42,7 +42,7 @@ public class HPEquipEngine : HPEquippable, IMassObject
     
     private EngineSpecifications _vanillaSpecifications;
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         Initialize();
     }

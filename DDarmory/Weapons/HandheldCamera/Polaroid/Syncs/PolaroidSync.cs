@@ -4,8 +4,8 @@ using VTNetworking;
 public class PolaroidSync : CameraSync
 {
     public Texture remoteTexture;
-    
-    protected override void OnNetInitialized()
+
+    public override void OnNetInitialized()
     {
         base.OnNetInitialized();
 

@@ -1,4 +1,6 @@
-﻿using Harmony;
+﻿using HarmonyLib;
+
+namespace DDArmory.Patches;
 
 [HarmonyPatch(typeof(WingVaporParticles), nameof(WingVaporParticles.UpdateEffect))]
 public class Patch_WingVaporParticles

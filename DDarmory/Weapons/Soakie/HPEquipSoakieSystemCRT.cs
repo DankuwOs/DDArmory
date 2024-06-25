@@ -3,7 +3,7 @@ using UnityEngine;
 
 	public class HPEquipSoakieSystemCRT : HPEquippable, IMassObject
 	{
-		protected override void OnEquip()
+		public override void OnEquip()
 		{
 			if (!weaponManager) return;
 		
