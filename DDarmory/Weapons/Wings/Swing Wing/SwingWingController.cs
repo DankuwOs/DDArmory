@@ -54,7 +54,6 @@ public class SwingWingController : WingController
             var currentG = Mathf.Abs(Vector3.Dot(flightInfo.acceleration, flightInfo.transform.up)) / 9.81f;
             if (currentG > _assist.gLimit)
             {
-                Debug.Log($"Current G = {currentG}");
                 _isLocked = true;
                 if (!manual)
                 {

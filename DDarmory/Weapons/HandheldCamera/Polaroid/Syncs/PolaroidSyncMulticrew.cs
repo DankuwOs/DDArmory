@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using DDArmory.Weapons.HandheldCamera.Syncs;
+using UnityEngine;
 using VTNetworking;
 
-public class PolaroidSync : CameraSync
+public class PolaroidSyncMulticrew : CameraSyncMulticrew
 {
     public Texture remoteTexture;
 

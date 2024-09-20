@@ -5,7 +5,7 @@ using VTOLVR.Multiplayer;
 
 public class AirToAirClusterMissile : ClusterMissile
 {
-    protected override void Start()
+    public override void Start()
     {
         base.Start();
         if (!clusterMissileSync) clusterMissileSync = GetComponent<ClusterMissileSync>();

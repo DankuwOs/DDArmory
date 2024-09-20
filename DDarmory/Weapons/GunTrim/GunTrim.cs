@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 public class GunTrim : MultiEquipCockpitElement
@@ -67,6 +67,9 @@ public class GunTrim : MultiEquipCockpitElement
     {
         // Wait for all the weapons to be equipped
         yield return null;
+        
+        if (!gun.actor || !gun.actor.weaponManager)
+            yield break;
         
         var wm = gun.actor.weaponManager;
         

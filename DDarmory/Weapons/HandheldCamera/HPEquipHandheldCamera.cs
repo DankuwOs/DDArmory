@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using OC;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Experimental.Rendering;
@@ -58,11 +59,16 @@ using UnityEngine.Rendering;
 
         private bool _saving;
 
-        protected override void OnEquip()
+        public override void OnEquip()
         {
             base.OnEquip();
 
             if (!interactable) return;
+            var ocCamera = GetComponentInChildren<OverCloudCamera>();
+            if (ocCamera == null)
+            {
+                PlayerVehicleSetup.SetupOCCam(camera.gameObject, true);
+            }
         
             interactable.interactable.OnStartInteraction += controller =>
             {
@@ -197,6 +203,30 @@ using UnityEngine.Rendering;
             
             yield break;
         }
+
+
+        public void RemoteCapture()
+        {
+            _screenshotRoutine = StartCoroutine(RemoteCaptureRoutine());
+        }
+        
+        private IEnumerator RemoteCaptureRoutine()
+        {
+            _capturing = true;
+
+            _heldBuffers = new List<byte[]>();
+            OnCapture.Invoke();
+
+            yield return StartCoroutine(Screenshot());
+
+            imagesTaken.AddToCount();
+
+            SaveImages();
+            _screenshotRoutine = null;
+
+            _capturing = false;
+        }
+        
 
         private void OnCompleteReadback(AsyncGPUReadbackRequest readbackRequest)
         {

@@ -2,9 +2,9 @@
 
 public class BiggingMissile : BurstMissile
 {
-    public override void FixedUpdate()
+    public override void BPU_FixedUpdate()
     {
-        base.FixedUpdate();
+        base.BPU_FixedUpdate();
 
         if (fired && !detonated)
         {

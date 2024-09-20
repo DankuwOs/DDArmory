@@ -1,10 +1,10 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class HPEquipFloaty : HPEquippable, IMassObject
 {
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         base.OnEquip();
         GrabComponents();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 public class HPEquipEngine : HPEquippable, IMassObject
@@ -42,7 +42,7 @@ public class HPEquipEngine : HPEquippable, IMassObject
     
     private EngineSpecifications _vanillaSpecifications;
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         Initialize();
     }
@@ -152,7 +152,7 @@ public class HPEquipEngine : HPEquippable, IMassObject
                     if (particleFxEngine[count] == i)
                     {
                         fx.Add(particleFx[count]);
-                        particleFx[count].particleSystem.gameObject.SetActive(true);
+                        //particleFx[count].particleSystem.gameObject.SetActive(true);
                         
                         particleFx[count].Init();
                         particleFx[count].Evaluate(0f);

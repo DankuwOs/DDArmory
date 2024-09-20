@@ -1,6 +1,6 @@
 ﻿public class HPEquipJAARM : HPEquipMissileLauncher
 {
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         base.OnEquip();
         foreach (var internalWeaponBay in weaponManager.GetComponentsInChildren<InternalWeaponBay>(true))

@@ -6,8 +6,8 @@ using VTNetworking;
 		private HPEquipSoakieSystem _soakie;
 
 		private HPEquipSoakieSystemMulticrew _soakieMulticrew;
-	
-		protected override void OnNetInitialized()
+
+		public override void OnNetInitialized()
 		{
 			if (netEntity == null)
 			{

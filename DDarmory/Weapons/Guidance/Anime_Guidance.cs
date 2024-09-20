@@ -2,7 +2,7 @@
 
 public class Anime_Guidance : MissileGuidanceUnit
 {
-    protected override void OnBeginGuidance()
+    public override void OnBeginGuidance()
     {
         base.OnBeginGuidance();
         _startTime = Time.time;

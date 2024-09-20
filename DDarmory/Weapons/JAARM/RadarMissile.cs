@@ -13,12 +13,9 @@ public class RadarMissile : Missile
 
         Radar.radarEnabled = true;
         Radar.myActor = actor;
-        Radar.OnDetectedActor += delegate(Actor detectedActor)
+        Radar.OnDetectedActor += delegate(Radar.DetectedUnit detectedUnit)
         {
-            detectedActor.DetectActor(actor.team, actor); // Don't know what this does so bye bye
-
-            if (VTOLMPUtils.IsMultiplayer())
-                VTOLMPDataLinkManager.instance.ReportKnownPosition(detectedActor, actor.team);
+            actor.DetectActor(actor.team, detectedUnit.detIdentity, TacticalSituationController.DataSources.Radar);
         };
     }
 }

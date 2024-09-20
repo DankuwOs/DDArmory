@@ -46,7 +46,6 @@ namespace DDArmory.Weapons.Wings.CV_Wings
 
             if (!switchTf)
             {
-                Debug.Log($"[CVWings_OnConfigDetach]: Switch tf null");
                 return;
             }
 
@@ -61,7 +60,6 @@ namespace DDArmory.Weapons.Wings.CV_Wings
         public override void OnUnequip()
         {
             base.OnUnequip();
-
             var vehicleInputManager = weaponManager.GetComponent<VehicleInputManager>();
             vehicleInputManager.tiltController = _tiltController;
             

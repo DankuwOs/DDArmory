@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DDArmory.Weapons.Utils;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
@@ -27,6 +28,8 @@ public class HPEquipGimbalEngine : HPEquipEngine
             controlSurfaceTransform.Init(); // Neo 
         }
         
+        DD_AeroControllerFix.AeroControllerFix(_controller);
+        
         _vehicleInputManager = wm.GetComponent<VehicleInputManager>();
     }
 
@@ -49,6 +52,8 @@ public class HPEquipGimbalEngine : HPEquipEngine
             }
         }
         _controller.controlSurfaces = controlSurfaces.ToArray();
+        
+        DD_AeroControllerFix.AeroControllerFix(_controller);
     }
     
     private void Update()

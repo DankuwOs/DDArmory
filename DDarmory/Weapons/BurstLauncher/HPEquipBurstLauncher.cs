@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class HPEquipBurstLauncher : HPEquipOpticalML
@@ -28,7 +27,7 @@ public class HPEquipBurstLauncher : HPEquipOpticalML
 
     private VehicleControlManifest _vcm;
 
-    protected override void OnEquip()
+    public override void OnEquip()
     {
         base.OnEquip();
 
@@ -105,7 +104,7 @@ public class HPEquipBurstLauncher : HPEquipOpticalML
         _firing = true;
         while (_firing)
         {
-            var tgtPoint = weaponManager.opticalTargeter.laserPoint;
+            var tgtPoint = weaponManager.opticalTargeter.tLaserPoint.position;
 
             List<Actor> actors = new();
             Actor.GetActorsInRadius(tgtPoint.point, searchRadius, weaponManager.actor.team,
@@ -184,13 +183,13 @@ public class HPEquipBurstLauncher : HPEquipOpticalML
         return burstCount[_burstIdx].ToString();
     }
 
-    protected override void SaveEquipData(ConfigNode weaponNode)
+    public override void SaveEquipData(ConfigNode weaponNode)
     {
         base.SaveEquipData(weaponNode);
         weaponNode.SetValue("burstIdx", _burstIdx);
     }
 
-    protected override void LoadEquipData(ConfigNode weaponNode)
+    public override void LoadEquipData(ConfigNode weaponNode)
     {
         base.LoadEquipData(weaponNode);
         weaponNode.TryGetValue("burstIdx", out int idx);

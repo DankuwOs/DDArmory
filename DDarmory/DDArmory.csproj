@@ -1,185 +1,88 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{41542D7D-76FA-43F5-AB88-0990B6C764DF}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <RootNamespace>DDArmory</RootNamespace>
-        <AssemblyName>DDArmory</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <LangVersion>9</LangVersion>
-        <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Assembly-CSharp.dll</HintPath>
-        </Reference>
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Xml.Linq" />
-        <Reference Include="System.Data.DataSetExtensions" />
-        <Reference Include="Microsoft.CSharp" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Net.Http" />
-        <Reference Include="System.Xml" />
-        <Reference Include="0Harmony">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\0Harmony.dll</HintPath>
-        </Reference>
-        <Reference Include="CustomWeaponBase">
-            <HintPath>..\..\Custom Weapon Base\Builds\CustomWeaponBase.dll</HintPath>
-        </Reference>
-        <Reference Include="ModLoader">
-            <HintPath>..\..\..\..\ModLoader.dll</HintPath>
-        </Reference>
-        <Reference Include="System.Core" />
-        <Reference Include="UnityEngine">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.AnimationModule">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.AssetBundleModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.AudioModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ImageConversionModule">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.IMGUIModule">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.InputLegacyModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.InputModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ParticleSystemModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.PhysicsModule">
-            <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.TextRenderingModule">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UI">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UI.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UIModule">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UIModule.dll</HintPath>
-        </Reference>
-        <Reference Include="Valve.Newtonsoft.Json">
-          <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Valve.Newtonsoft.Json.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <AppDesigner Include="Properties\" />
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="Main.cs" />
-        <Compile Include="Patches\Patch_EngineEffects_EngineParticleFX.cs" />
-        <Compile Include="Patches\Patch_Health_Damage.cs" />
-        <Compile Include="Patches\Patch_Wing.cs" />
-        <Compile Include="Patches\Patch_WingVaporParticles.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Weapons\ADAPS\HPEquipADAPS.cs" />
-        <Compile Include="Weapons\ALFAS\HPEquipGPSMissile.cs" />
-        <Compile Include="Weapons\BurstLauncher\HPEquipBurstLauncher.cs" />
-        <Compile Include="Weapons\CJSM\AirToAirClusterMissile.cs" />
-        <Compile Include="Weapons\Engines\GimbalEngine\HPEquipGimbalEngine.cs" />
-        <Compile Include="Weapons\Engines\HPEquipEngine.cs" />
-        <Compile Include="Weapons\FAB9000\BiggingMissile.cs" />
-        <Compile Include="Weapons\Floaties\FloatySync.cs" />
-        <Compile Include="Weapons\Floaties\HPEquipFloaty.cs" />
-        <Compile Include="Weapons\Floaties\HPEquipFloatyGunTurret.cs" />
-        <Compile Include="Weapons\FUNK\FunkMissile.cs" />
-        <Compile Include="Weapons\FUNK\FunkyLines.cs" />
-        <Compile Include="Weapons\Guidance\Anime_Guidance.cs" />
-        <Compile Include="Weapons\Guidance\imtargetedlmao.cs" />
-        <Compile Include="Weapons\Guidance\JAARMGuidance.cs" />
-        <Compile Include="Weapons\Guidance\LoiterGuidance.cs" />
-        <Compile Include="Weapons\GunTrim\GunTrim.cs" />
-        <Compile Include="Weapons\HandheldCamera\Polaroid\HPEquipPolaroid.cs" />
-        <Compile Include="Weapons\HandheldCamera\Polaroid\PolaroidObject.cs" />
-        <Compile Include="Weapons\HandheldCamera\Polaroid\Syncs\PolaroidObjectSync.cs" />
-        <Compile Include="Weapons\HandheldCamera\Polaroid\Syncs\PolaroidSync.cs" />
-        <Compile Include="Weapons\HandheldCamera\Syncs\CameraSync.cs" />
-        <Compile Include="Weapons\HandheldCamera\Text Scripts\DriveUsage.cs" />
-        <Compile Include="Weapons\HandheldCamera\Text Scripts\ImagesTaken.cs" />
-        <Compile Include="Weapons\HandheldCamera\Text Scripts\RamUsage.cs" />
-        <Compile Include="Weapons\HandheldCamera\Text Scripts\SavingStatus.cs" />
-        <Compile Include="Weapons\JAARM\HPEquipJAARM.cs" />
-        <Compile Include="Weapons\JAARM\RadarMissile.cs" />
-        <Compile Include="Weapons\LaserWings\GetTeam.cs" />
-        <Compile Include="Weapons\LaserWings\HPEquipLaserWings.cs" />
-        <Compile Include="Weapons\LaserWings\WingsSync.cs" />
-        <Compile Include="Weapons\LaserWings\WingsTouch.cs" />
-        <Compile Include="Weapons\MDS\HPEquipMDS.cs" />
-        <Compile Include="Weapons\SatelliteGun\HPEquipSG.cs" />
-        <Compile Include="Weapons\SatelliteGun\HPEquipSGHandHeld.cs" />
-        <Compile Include="Weapons\SatelliteGun\SGSync.cs" />
-        <Compile Include="Weapons\HandheldCamera\HPEquipHandheldCamera.cs" />
-        <Compile Include="Weapons\Soakie\CRTRenderer.cs" />
-        <Compile Include="Weapons\Soakie\HPEquipSoakieSystem.cs" />
-        <Compile Include="Weapons\Soakie\HPEquipSoakieSystemCRT.cs" />
-        <Compile Include="Weapons\Soakie\HPEquipSoakieSystemMulticrew.cs" />
-        <Compile Include="Weapons\Soakie\SoakieSystemSync.cs" />
-        <Compile Include="Weapons\ThrustReverser\HPEquipThrustReverser.cs" />
-        <Compile Include="Weapons\Utils\DebugLinesManager.cs" />
-        <Compile Include="Weapons\Utils\DebugWingUtils.cs" />
-        <Compile Include="Weapons\Utils\FindTransform.cs" />
-        <Compile Include="Weapons\Utils\GrabInteractable.cs" />
-        <Compile Include="Weapons\Utils\MultiEquipCockpitElement.cs" />
-        <Compile Include="Weapons\Utils\PID\FloatAdjuster.cs" />
-        <Compile Include="Weapons\Utils\PID\PIDFixer.cs" />
-        <Compile Include="Weapons\Utils\WingVesselRB.cs" />
-        <Compile Include="Weapons\Wings\CV Wings\HPEquipCVWing.cs" />
-        <Compile Include="Weapons\Wings\HPEquipWing.cs" />
-        <Compile Include="Weapons\Wings\OPFOR Wings\HPEquipOPFORWing.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepBar.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepDisplay.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\Display Components\SweepMode.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\HPEquipSwingWing.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\SweptWing.cs" />
-        <Compile Include="Weapons\Wings\Swing Wing\SwingWingController.cs" />
-        <Compile Include="Weapons\Wings\WingController.cs" />
-        <Compile Include="Weapons\XPGM\DDRocketLauncher.cs" />
-        <Compile Include="Weapons\XPGM\DD_FlechetteAirburstRocket.cs" />
-        <Compile Include="Weapons\XPGM\HPEquipHeadTrackOML.cs" />
-        <Compile Include="Weapons\XPGM\OmlAimPoint.cs" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <PropertyGroup>
-        <PostBuildEvent>copy "$(TargetPath)" "D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\VTOLVR_ModLoader\projects\My Mods\DDArmory\Builds\DDArmory.dll"
-copy "$(TargetPath)" "D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.6.1\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll"</PostBuildEvent>
-    </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\@Mod Loader\Managed\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp" Publicize="True">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CustomWeaponBase">
+      <HintPath>..\..\..\..\..\@Mod Loader\Mods\Custom Weapons Base\CustomWeaponBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Win64">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+    </Reference>
+    <Reference Include="Mod Loader" Publicize="True">
+      <HintPath>..\..\..\..\..\@Mod Loader\Managed\Mod Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="ModLoader.Framework">
+      <HintPath>..\..\..\..\..\@Mod Loader\Managed\ModLoader.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Valve.Newtonsoft.Json">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\Valve.Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Danku.BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\@Mod Loader\Mods\DD Armory\DDArmory.dll&quot;&#xA;copy &quot;$(TargetPath)&quot; &quot;D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.10.1\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll&quot;" />
+  </Target>
 </Project>

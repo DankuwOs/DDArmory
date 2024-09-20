@@ -4,8 +4,8 @@ using VTNetworking;
 public class CameraSync : VTNetSyncRPCOnly
 {
     public HPEquipHandheldCamera camera;
-    
-    protected override void OnNetInitialized()
+
+    public override void OnNetInitialized()
     {
         base.OnNetInitialized();
 

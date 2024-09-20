@@ -6,7 +6,7 @@ using Random = System.Random;
 
 	public class HPEquipSoakieSystem : HPEquippable, IMassObject
 	{
-		protected override void OnEquip()
+		public override void OnEquip()
 		{
 			if (weaponManager)
 			{

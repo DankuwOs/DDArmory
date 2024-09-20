@@ -3,7 +3,7 @@ using VTNetworking;
 
 public class FloatySync : VTNetSyncRPCOnly
 {
-    protected override void OnNetInitialized()
+    public override void OnNetInitialized()
     {
         if (netEntity == null) Debug.LogError("Floaty has no netEntity!");
         _floaty = GetComponent<HPEquipFloaty>();

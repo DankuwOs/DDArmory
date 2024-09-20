@@ -4,7 +4,7 @@ using UnityEngine;
 
 	public class HPEquipSoakieSystemMulticrew : HPEquippable, IMassObject
 	{
-		protected override void OnEquip()
+		public override void OnEquip()
 		{
 			var flag = !weaponManager;
 			if (!flag)
@@ -88,8 +88,8 @@ using UnityEngine;
 				_battery.Drain(num);
 				var sufficientCharge = _battery.currentCharge > num  && _battery.connected;
 			
-				_colorBrightness = Mathf.Clamp(sufficientCharge? _colorBrightness : 0f, minBrightness, maxBrightness);
-				_depthBrightness = Mathf.Clamp(sufficientCharge? _depthBrightness : 0f, minBrightness, maxBrightness);
+				_matColorBrightness = Mathf.Clamp(sufficientCharge? _colorBrightness : 0f, minBrightness, maxBrightness);
+				_matDepthBrightness = Mathf.Clamp(sufficientCharge? _depthBrightness : 0f, minBrightness, maxBrightness);
 				SetMaterialValues();
 			}
 		}
@@ -98,8 +98,8 @@ using UnityEngine;
 		{
 			foreach (var material in _materials)
 			{
-				material.SetFloat(colorBrightnessProp, _colorBrightness);
-				material.SetFloat(depthBrightnessProp, _depthBrightness);
+				material.SetFloat(colorBrightnessProp, _matColorBrightness);
+				material.SetFloat(depthBrightnessProp, _matDepthBrightness);
 			}
 		}
 
@@ -173,8 +173,11 @@ using UnityEngine;
 		private Material[] _materials;
 
 		private float _colorBrightness;
+		private float _matColorBrightness;
 	
 		private float _depthBrightness;
+		private float _matDepthBrightness;
+		
 
 		private Battery _battery;
 

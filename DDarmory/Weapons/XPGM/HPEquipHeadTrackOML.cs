@@ -1,61 +1,87 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using VTOLVR.Multiplayer;
 
 public class HPEquipHeadTrackOML : HPEquipOpticalML
 {
-	protected override void OnEquip()
+	public bool useHeadTrackDefault;
+
+	public VisualTargetFinder visualTargetFinder;
+	
+	public UnityEvent OnFire = new();
+	
+	
+	private bool _useHeadTrack;
+	private string HeadTrack => _useHeadTrack ? "TRUE" : "FALSE";
+
+	private bool _firing;
+
+	private Transform _headTf;
+	
+	public override void OnEquip()
 	{
-		oml = (OpticalMissileLauncher)ml;
-		var joysticks = weaponManager.GetComponent<VehicleControlManifest>().joysticks;
-		foreach (var vrjoystick in joysticks)
+		base.OnEquip();
+
+		var eqFunctions = equipFunctions.ToList();
+
+		var headTrackEqFunction = new EquipFunction();
+		headTrackEqFunction.optionName = "Enable Head Track";
+		headTrackEqFunction.optionReturnLabel = HeadTrack;
+		headTrackEqFunction.optionEvent += HeadTrackChanged;
+		
+		eqFunctions.Add(headTrackEqFunction);
+
+		foreach (var equipFunction in eqFunctions.ToArray())
 		{
-			vrjoystick.OnThumbstickButtonDown.AddListener(delegate
+			if (equipFunction.optionName == s_uncageMode)
 			{
-				if (itemActivated)
-				{
-					_headTracking = !_headTracking;
-				}
-			});
+				eqFunctions.Remove(equipFunction);
+			}
 		}
+
+		autoUncage = false;
+		autoUncageFraction = 0f;
+		equipFunctions = eqFunctions.ToArray();
+	}
+
+	private string HeadTrackChanged()
+	{
+		_useHeadTrack = !_useHeadTrack;
+		return HeadTrack;
 	}
 
 	public override void OnStartFire()
 	{
 		base.OnStartFire();
+
 		_firing = true;
+		
+		if (!_useHeadTrack)
+			return;
+		StartCoroutine(HeadTrackRoutine());
 	}
 
 	public override void OnStopFire()
 	{
 		base.OnStopFire();
+
 		_firing = false;
-		_tgt = null;
 	}
 
-	private void Update()
+	public IEnumerator HeadTrackRoutine()
 	{
-		if(!itemActivated || !visualTargetFinder || visualTargetFinder.targetsSeen.Count == 0 || !_firing || !_headTracking || !weaponManager.opticalTargeter.powered || _tgt)
-			return;
-		
-			var source = from a in visualTargetFinder.targetsSeen
-			orderby Vector3.Distance(visualTargetFinder.fovReference.position, a.position)
-			select a;
-			_tgt = source.First();
-			weaponManager.opticalTargeter.Lock(_tgt.position);
+		if (visualTargetFinder == null || weaponManager?.opticalTargeter == null || _headTf == null)
+			yield break;
+
+		while (_firing)
+		{
+			if (visualTargetFinder.attackingTarget)
+				weaponManager.opticalTargeter.Lock(visualTargetFinder.attackingTarget.position);
+			
+			yield return null;
+		}
 	}
-
-	[Header("Head Tracking")]
-	public VisualTargetFinder visualTargetFinder;
-
-	public UnityEvent OnFire = new UnityEvent();
-
-	[NonSerialized]
-	public bool _headTracking = true;
-
-	private bool _firing;
-
-	[NonSerialized]
-	public Actor _tgt;
 }
