@@ -104,7 +104,7 @@ public class HPEquipBurstLauncher : HPEquipOpticalML
         _firing = true;
         while (_firing)
         {
-            var tgtPoint = weaponManager.opticalTargeter.laserPoint;
+            var tgtPoint = weaponManager.opticalTargeter.tLaserPoint.position;
 
             List<Actor> actors = new();
             Actor.GetActorsInRadius(tgtPoint.point, searchRadius, weaponManager.actor.team,

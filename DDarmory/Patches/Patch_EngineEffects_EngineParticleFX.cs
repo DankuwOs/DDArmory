@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+﻿/*using System.Runtime.CompilerServices;
 using HarmonyLib;
 using UnityEngine;
 
@@ -16,7 +16,8 @@ public class Patch_EngineEffects_EngineParticleFX
 
         var particleSystemMain = __instance.particleSystem.main;
         particleSystemMain.startSpeed = __instance.speedCurve.Evaluate(throttle);
-        particleSystemMain.startSize = __instance.sizeCurve.Evaluate(throttle);
+        if (__instance.useSizeCurve)
+            particleSystemMain.startSize = __instance.sizeCurve.Evaluate(throttle);
         if (__instance.useColorGradient)
         {
             particleSystemMain.startColor = __instance.colorGradient.Evaluate(throttle);
@@ -24,4 +25,4 @@ public class Patch_EngineEffects_EngineParticleFX
 
         return false;
     }
-}
+}*/

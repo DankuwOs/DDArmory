@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using VTOLVR.Multiplayer;
 
 namespace DDArmory.Weapons.HandheldCamera.Syncs;
 
 public class CameraSyncMulticrew : CameraSync
 {
-    private MultiUserVehicleSync muvs;
+    protected MultiUserVehicleSync muvs;
 
     private void OnEnable()
     {
@@ -27,7 +28,6 @@ public class CameraSyncMulticrew : CameraSync
     [VTRPC]
     private void RPC_OnCapture_MUVS()
     {
-        
-        camera.RemoteFlash();
+        camera.RemoteCapture();
     }
 }

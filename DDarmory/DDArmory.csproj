@@ -83,6 +83,6 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\@Mod Loader\Mods\DD Armory\DDArmory.dll&quot;&#xA;copy &quot;$(TargetPath)&quot; &quot;D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.9.5\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll&quot;" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;D:\Games\Steam [Software no games here]\steamapps\common\VTOL VR\@Mod Loader\Mods\DD Armory\DDArmory.dll&quot;&#xA;copy &quot;$(TargetPath)&quot; &quot;D:\Programs n Friends\[000] Unity Projects\VTOL VR v1.10.1\Assets\_VTOL Modding Scripts\DLLS\DDArmory.dll&quot;" />
   </Target>
 </Project>

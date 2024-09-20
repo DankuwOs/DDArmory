@@ -27,8 +27,6 @@ public class Patch_RadarJammer_JTransmitter
             var fixedRecPos = __instance.transform.position + rot * (receiverPos - __instance.transform.position);
             
             receiverPos = fixedRecPos; // This ensures the EMP will hit everything i think
-            
-            Debug.Log($"[Patched jammer]: Dot of thing is {Vector3.Dot(receiverPos, __instance.transmitDirection)}");
         }
     }
 }

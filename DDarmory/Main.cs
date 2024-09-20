@@ -8,9 +8,7 @@ namespace DDArmory
     [ItemId("danku-ddarmory")]
     public class Main : VtolMod
     {
-        
-        
-        public void Awake()
+        /*public void Awake()
         {
             Debug.Log($"[DDA]: Waiting for me to be loaded...");
             StartCoroutine(OnAwake());
@@ -27,7 +25,7 @@ namespace DDArmory
         {
             bool itemLoaded = ModLoader.ModLoader.Instance.IsItemLoaded(CustomWeaponBase.Main.instance.GetDirectoryForName("DD Armory"));
             return itemLoaded;
-        }
+        }*/
 
         public override void UnLoad()
         {

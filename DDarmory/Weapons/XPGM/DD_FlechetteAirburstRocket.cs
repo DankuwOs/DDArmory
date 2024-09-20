@@ -22,8 +22,7 @@ public class DD_FlechetteAirburstRocket : Rocket
 		flechetteGun.actor = sourceActor;
 		while (true)
 		{
-			RaycastHit raycastHit;
-			var flag = !Physics.Raycast(rayTf.position, rayTf.forward, out raycastHit, distance);
+			var flag = !Physics.Raycast(rayTf.position, rayTf.forward, out _, distance);
 			if (!flag)
 			{
 				break;
@@ -37,7 +36,6 @@ public class DD_FlechetteAirburstRocket : Rocket
 			ps.transform.position = transform.position;
 			ps.transform.rotation = transform.rotation;
 			ps.Emit((int)ps.emission.GetBurst(0).count.constant);
-			ps = null;
 		}
 		yield return new WaitForSeconds(delay);
 		flechetteGun.SetFire(true);

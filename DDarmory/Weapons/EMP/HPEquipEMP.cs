@@ -41,6 +41,8 @@ public class HPEquipEMP : HPEquippable
 
     public AudioClip empClip;
 
+    public ParticleSystem[] particleSystems;
+
     [HideInInspector]
     public UnityEvent OnEMP;
 
@@ -184,13 +186,20 @@ public class HPEquipEMP : HPEquippable
         {
             battery = actor.weaponManager.battery;
         }
-        
-        AIPilot aiPilot = actor.GetComponent<AIPilot>();
-        if (aiPilot)
+        else
         {
+            battery = GetComponentInChildren<Battery>();
+        }
+        
+        AutoPilot autoPilot = actor.GetComponent<AutoPilot>();
+        if (autoPilot && autoPilot.enabled)
+        {
+            autoPilot.enabled = false;
+            //aiPilot.enabled = false;
             // Ai pilot stuff is hard ill just destroy em.
-            aiPilot.health.Damage(500, transform.position, Health.DamageTypes.Impact, weaponManager.actor);
-            yield break;
+            //aiPilot.health.Damage(500, transform.position, Health.DamageTypes.Impact, weaponManager.actor);
+
+            // yield break;
         }
 
         AIUnitSpawn aiunitSpawn = actor.GetComponent<AIUnitSpawn>(); // easiest way i thought to disable brozos.
@@ -217,26 +226,36 @@ public class HPEquipEMP : HPEquippable
                 radar.radarEnabled = false;
             }
         }
-
+        
         yield return new WaitForFixedUpdate();
         
         
         float t = 0;
-        float dChargeTime = (1 - GetDrainT(wPos, actor.position)) * disableChargeTime; // Change the duration of being disabled based on distance.
+        float dChargeTime = GetDrainT(wPos, actor.position) * disableChargeTime; // Change the duration of being disabled based on distance.
+        Debug.Log($"DChargeTime = {dChargeTime}");
         while (t < dChargeTime)
         {
+            var drainT = GetDrainT(wPos, actor.position);
+            
             if (battery != null)
             {
-                float drainAmt = battery.maxCharge * GetDrainT(wPos, actor.position);
+                float drainAmt = battery.maxCharge * drainT;
+                Debug.Log($"Draining battery to '{battery.currentCharge - drainAmt}' for actor '{actor.actorName} - {actor.designation}'. (drainAmt = '{drainAmt}')");
                 battery.SetCharge(battery.currentCharge - drainAmt); // Not using drain because reasons (why the fuck?????)
             }
-            
+            else
+            {
+                Debug.Log($"Battery is null what");
+            }
             t += Time.deltaTime;
             yield return null;
         }
 
         if (aiunitSpawn)
             aiunitSpawn.SetEngageEnemies(aiUnitSpawnEngageEnemies);
+
+        if (autoPilot)
+            autoPilot.enabled = true;
 
         if (radars.Count > 0)
         {
@@ -256,6 +275,12 @@ public class HPEquipEMP : HPEquippable
     public void OnFire()
     {
         fireSource.Play();
+        
+        foreach (var particleSystem in particleSystems)
+        {
+            particleSystem.Play();
+        }
+        
         _cooldownT = cooldownTime;
     }
 
@@ -265,6 +290,7 @@ public class HPEquipEMP : HPEquippable
         float t = falloffCurve.Evaluate(Vector3.Distance(wPos, pos) / radius);
         if (invert)
             t = 1 - t;
+        Debug.Log($"DrainT for dist {Vector3.Distance(wPos, pos)} = {t}");
         return t;
     }
 

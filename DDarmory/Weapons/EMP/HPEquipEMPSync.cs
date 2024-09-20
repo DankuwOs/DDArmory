@@ -70,8 +70,8 @@ public class HPEquipEMPSync : VTNetSyncRPCOnly
     [VTRPC]
     private void RPC_OnEMPEntity(int netEntityID)
     {
-        var entity = VTNetSceneManager.instance.sceneEntities.FirstOrDefault(e => e.entityID == netEntityID);
-        
+        var entity =  VTNetworkManager.instance.GetEntity(netEntityID);
+
         Debug.Log($"[EMPRPC]: Recieved RPC for '{netEntityID}' and I am questioning if I am found? {entity != null}");
         
         if (entity && entity.GetComponent<Actor>() is var actor)

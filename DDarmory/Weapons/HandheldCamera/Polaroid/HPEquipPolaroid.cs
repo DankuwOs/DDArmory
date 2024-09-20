@@ -14,6 +14,8 @@ public class HPEquipPolaroid : HPEquipHandheldCamera
         public Transform polaroidParent;
 
         public PolaroidSync polaroidSync;
+
+        public PolaroidSyncMulticrew polaroidSyncMulticrew;
         
 
         private PolaroidObject _lastPolaroid;
@@ -60,7 +62,11 @@ public class HPEquipPolaroid : HPEquipHandheldCamera
                 newPolaroid = polaroidInstantiateRequest.obj;
                 newPolaroid.transform.parent = polaroidParent;
 
-                polaroidSync.SendRPC("RPC_SendPolaroid", newPolaroid.GetComponent<VTNetEntity>().entityID);
+                if (polaroidSync)
+                    polaroidSync.SendRPC("RPC_SendPolaroid", newPolaroid.GetComponent<VTNetEntity>().entityID);
+
+                if (polaroidSyncMulticrew)
+                    polaroidSyncMulticrew.SendRPC("RPC_SendPolaroid", newPolaroid.GetComponent<VTNetEntity>().entityID);
             }
 
             var polaroidTransform = newPolaroid.transform;

@@ -55,7 +55,6 @@ public class Patch_JammerReciever
             }
             
             var dirPower = Mathf.Pow(Vector3.Dot(receiverDir, normalized), fovDotPower);
-            Debug.Log($"[JammerRecieverPatch(JE)]: DirPower = {dirPower}");
             if (dirPower > 0f)
             {
                 energy += jTransmitter.GetSignalStrength(position) * dirPower;
@@ -114,7 +113,6 @@ public class Patch_JammerReciever
             }
             
             var dirPower = Mathf.Pow(Vector3.Dot(receiverDir, normalized), fovDotPower);
-            Debug.Log($"[JammerRecieverPatch(JEWithDir)]: DirPower = {dirPower}");
             if (dirPower > 0f)
             {
                 var signalStrength = jTransmitter.GetSignalStrength(position) * dirPower;
@@ -184,7 +182,6 @@ public class Patch_JammerReciever
             }
 
             var dirPower = Mathf.Pow(Vector3.Dot(receiverDir, normalized), fovDotPower);
-            Debug.Log($"[JammerRecieverPatch(JEFreq)]: DirPower = {dirPower}");
             if (dirPower > 0f)
             {
                 energy += jTransmitter.GetSignalStrength(position) * dirPower;
@@ -252,7 +249,6 @@ public class Patch_JammerReciever
             }
 
             var dirPower = Mathf.Pow((Vector3.Dot(receiverDir, normalized) + 1) / 2, fovDotPower);
-            Debug.Log($"[JammerRecieverPatch(JEFreqOmni)]: DirPower = {dirPower}");
             if (dirPower > 0f)
             {
                 energy += jTransmitter.GetSignalStrength(position) * dirPower;

@@ -152,7 +152,7 @@ public class HPEquipEngine : HPEquippable, IMassObject
                     if (particleFxEngine[count] == i)
                     {
                         fx.Add(particleFx[count]);
-                        particleFx[count].particleSystem.gameObject.SetActive(true);
+                        //particleFx[count].particleSystem.gameObject.SetActive(true);
                         
                         particleFx[count].Init();
                         particleFx[count].Evaluate(0f);
