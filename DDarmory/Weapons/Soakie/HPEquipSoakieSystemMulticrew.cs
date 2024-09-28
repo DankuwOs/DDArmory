@@ -17,7 +17,8 @@ using UnityEngine;
 				var componentsInChildren = weaponManager.GetComponentsInChildren<Hitbox>(true);
 				foreach (var hitbox in componentsInChildren)
 				{
-					_hitBoxes.Add(hitbox, hitbox.subtractiveArmor);
+					if (!_hitBoxes.ContainsKey(hitbox))
+						_hitBoxes.Add(hitbox, hitbox.subtractiveArmor);
 					hitbox.subtractiveArmor += additionalSubtractiveArmor;
 				}
 				SetTransforms();

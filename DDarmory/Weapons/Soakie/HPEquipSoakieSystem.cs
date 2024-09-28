@@ -24,8 +24,6 @@ using Random = System.Random;
 					}
 				}
 
-			
-
 				SetTransforms();
 			}
 		}
