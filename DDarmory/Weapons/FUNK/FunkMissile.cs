@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
+// THIS IS FUCKING GROSS
 public class FunkMissile : MonoBehaviour
 {
     public Missile burstMissile;

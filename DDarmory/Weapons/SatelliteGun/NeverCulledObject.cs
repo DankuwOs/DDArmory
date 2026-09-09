@@ -8,6 +8,7 @@ public class NeverCulledObject : MonoBehaviour
 {
     private Mesh _mesh;
 
+    
     private void Awake()
     {
         var mFilter = GetComponent<MeshFilter>();

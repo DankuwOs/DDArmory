@@ -66,7 +66,7 @@ public class HPEquipWing : HPEquippable, IMassObject
             {
                 var parts = playerVehicleNetSync.vehicleParts.ToList();
                 
-                foreach (var vehiclePart in parts)
+                foreach (var vehiclePart in playerVehicleNetSync.vehicleParts)
                 {
                     if (_myParts.Contains(vehiclePart))
                         parts.Remove(vehiclePart);

@@ -10,9 +10,7 @@ public class FogLightFixed : OverCloudFogLight
         get
         {
             if (_light != null) return _light;
-            Debug.Log($"light null :~(");
             _light = GetComponent<Light>();
-            Debug.Log($"light {_light != null} :~(?");
             return _light;
 
         }
@@ -24,6 +22,7 @@ public class FogLightFixed : OverCloudFogLight
             enabled = false;
 
         m_Material = new Material(Shader.Find("OverCloud/FogLight"));
+        m_Material.renderQueue = 3000;
         m_Material.SetFloat("_Atten", 1);
     }
 }

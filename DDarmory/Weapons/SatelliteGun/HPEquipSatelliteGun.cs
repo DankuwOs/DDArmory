@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+using VTOLVR.Multiplayer;
 
 namespace DDArmory.Weapons.SatelliteGun;
 
@@ -34,15 +34,18 @@ public class HPEquipSatelliteGun : HPEquipGun
 
     public Action<LaserObjectParams> OnUpdateLaser;
 
+    private Quaternion _prevRot = Quaternion.identity;
+    
+    
+
     public override void OnEquip()
     {
         base.OnEquip();
-        
         windingWeapon.OnWind.AddListener(OnWind);
 
         var psMain = ps.main;
         
-        psMain.startSpeed = new ParticleSystem.MinMaxCurve(gun.bulletInfo.speed); // Don't know if doing just one will work, so im doing this.
+        psMain.startSpeed = new ParticleSystem.MinMaxCurve(gun.bulletInfo.speed);
     }
 
     public override Vector3 GetAimPoint()
@@ -77,10 +80,12 @@ public class HPEquipSatelliteGun : HPEquipGun
     private void Update()
     {
         satelliteTF.transform.position = new Vector3(transform.position.x, height, transform.position.z);
-        var point = Physics.Raycast(gun.fireTransforms[0].position, gun.fireTransforms[0].forward, out var hit, height * 10) ? hit.point : GetTargetPoint();
-        laserFogLight.transform.position = point + (-(point - satelliteTF.position).normalized * (laserFogLight.range * 0.75f));
+        var point = Physics.Raycast(gun.fireTransforms[0].position, gun.fireTransforms[0].forward, out var hit, height * 10) ? hit.point : GetAimPoint();
+        laserFogLight.transform.position = point + Vector3.up * (laserFogLight.range * 0.65f);
+        //laserFogLight.transform.position = point + (-(point - satelliteTF.position).normalized * (laserFogLight.range * 0.75f)); // Doesn't even function and i cant math lmeow
         
         UpdateTargeting();
+        UpdateLaser();
     }
 
     protected virtual Vector3 GetTargetPoint()
@@ -90,7 +95,10 @@ public class HPEquipSatelliteGun : HPEquipGun
 
         if (handheld)
         {
-            return Physics.Raycast(laserTf.position, laserTf.forward, out var laserPoint, height * 10) ? laserPoint.point : gun.fireTransforms[0].forward * height;
+            var targetPos = Physics.Raycast(laserTf.position, laserTf.forward, out var laserPoint, height * 10)
+                ? laserPoint.point
+                : gun.fireTransforms[0].forward * height;
+            return targetPos;
         }
         
         var targeter = weaponManager.opticalTargeter;
@@ -98,11 +106,11 @@ public class HPEquipSatelliteGun : HPEquipGun
             return gun.fireTransforms[0].forward * height;
         if (targeter.locked)
         {
-            if (targeter.lockedActor)
-                return gun.GetCalculatedTargetPosition(targeter.lockedActor, true);
-            return targeter.lockTransform.position;
+            var targetPos = targeter.lockedActor ? gun.GetCalculatedTargetPosition(targeter.lockedActor, true) : targeter.lockTransform.position;
+            return targetPos;
         }
         var point = Physics.Raycast(gun.fireTransforms[0].position, gun.fireTransforms[0].forward, out var hit, height * 10) ? hit.point : gun.fireTransforms[0].forward * height;
+        
         return point;
     }
 
@@ -111,9 +119,11 @@ public class HPEquipSatelliteGun : HPEquipGun
         var targetPoint = GetTargetPoint();
         
         var lookRotation = Quaternion.LookRotation(targetPoint - satelliteTF.position);
-        var newRot = Quaternion.RotateTowards(satelliteTF.rotation, lookRotation,
+        // Use previous rotation instead of the current transforms one to keep it stable since the satellite is still parented to us.
+        var newRot = Quaternion.RotateTowards(_prevRot, lookRotation,
             rotationSpeed.Evaluate(windingWeapon.WindT()));
         satelliteTF.rotation = newRot;
+        _prevRot = newRot;
     }
 
     public void OnWind(float t)
@@ -127,29 +137,42 @@ public class HPEquipSatelliteGun : HPEquipGun
 
     public void UpdateLaser()
     {
-        LaserObjectParams laserObjectParams = new LaserObjectParams();
+        if (!handheld)
+            return;
+        
+        bool sendLaserParams = !remote && VTOLMPUtils.IsMultiplayer();
+        
+        LaserObjectParams laserObjectParams = null;
+        if (sendLaserParams)
+            laserObjectParams = new LaserObjectParams();
         
         if (Physics.Raycast(laserTf.position, laserTf.forward, out var hitInfo, 75000f, raycastLayers,
                 QueryTriggerInteraction.Ignore))
         {
             laserLineRenderer.SetPosition(1, hitInfo.point);
-            laserObjectParams.laserEnd = VTMapManager.WorldToGlobalPoint(hitInfo.point);
             
             var lightPos = hitInfo.point - (laserTf.forward * 0.05f); // Move the light position a little in front of the hit point 
             
             laserLight.transform.position = lightPos;
-            laserObjectParams.laserLightPos = VTMapManager.WorldToGlobalPoint(lightPos);
+            
+            if (sendLaserParams)
+            {
+                laserObjectParams.laserEnd = VTMapManager.WorldToGlobalPoint(hitInfo.point);
+                laserObjectParams.laserLightPos = VTMapManager.WorldToGlobalPoint(lightPos);
+            }
             return;
         }
 
         var forwardPos = laserTf.position + laserTf.forward * 8000f;
         
         laserLineRenderer.SetPosition(1, forwardPos);
-        laserObjectParams.laserEnd = VTMapManager.WorldToGlobalPoint(forwardPos);
-
         laserLight.transform.position = forwardPos;
-        laserObjectParams.laserLightPos = VTMapManager.WorldToGlobalPoint(forwardPos);
+
+        if (!sendLaserParams) return;
         
+        laserObjectParams.laserEnd = VTMapManager.WorldToGlobalPoint(forwardPos);
+        laserObjectParams.laserLightPos = VTMapManager.WorldToGlobalPoint(forwardPos);
+
         OnUpdateLaser?.Invoke(laserObjectParams);
     }
 

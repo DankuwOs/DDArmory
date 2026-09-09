@@ -13,7 +13,7 @@ public class HPEquipEMP : HPEquippable
 {
     [Header("EMP")] 
     public float radius;
-
+    
     public float cooldownTime;
     
     public float disableChargeTime = 7.5f;
@@ -191,15 +191,14 @@ public class HPEquipEMP : HPEquippable
             battery = GetComponentInChildren<Battery>();
         }
         
-        AutoPilot autoPilot = actor.GetComponent<AutoPilot>();
-        if (autoPilot && autoPilot.enabled)
+        AIPilot aiPilot = actor.GetComponent<AIPilot>();
+        if (aiPilot && aiPilot.enabled)
         {
-            autoPilot.enabled = false;
+            //aiPilot.enabled = false;
             //aiPilot.enabled = false;
             // Ai pilot stuff is hard ill just destroy em.
-            //aiPilot.health.Damage(500, transform.position, Health.DamageTypes.Impact, weaponManager.actor);
-
-            // yield break;
+            aiPilot.health.Damage(500, transform.position, Health.DamageTypes.Impact, weaponManager.actor);
+            yield break;
         }
 
         AIUnitSpawn aiunitSpawn = actor.GetComponent<AIUnitSpawn>(); // easiest way i thought to disable brozos.
@@ -254,8 +253,8 @@ public class HPEquipEMP : HPEquippable
         if (aiunitSpawn)
             aiunitSpawn.SetEngageEnemies(aiUnitSpawnEngageEnemies);
 
-        if (autoPilot)
-            autoPilot.enabled = true;
+        /*if (aiPilot)
+            aiPilot.enabled = true;*/
 
         if (radars.Count > 0)
         {

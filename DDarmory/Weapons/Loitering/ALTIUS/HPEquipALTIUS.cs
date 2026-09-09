@@ -23,6 +23,12 @@ public class HPEquipALTIUS : HPEquipDecoyMissile
         }
     }
 
+    public override void OnEquip()
+    {
+        base.OnEquip();
+        iwbHP.weaponManager = weaponManager;
+    }
+
     public override void FireMissile()
     {
         var missile = ml.GetNextMissile();

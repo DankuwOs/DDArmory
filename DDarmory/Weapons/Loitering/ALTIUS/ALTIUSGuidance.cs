@@ -269,8 +269,8 @@ public class ALTIUSGuidance : AirLaunchedDecoyGuidance
 
         var dist = Vector3.Distance(transform.position, targetLeadPos);
         
-        return tgt.velocity.magnitude > 100f && (dist < boosterDist ||
-                                                 (Vector3.Dot(transform.forward, tgt.transform.forward) > 0.25f &&
-                                                  dist < boosterDist * 2.5f));
+        return dist < boosterDist || (tgt.velocity.magnitude > 100f &&
+                                      Vector3.Dot(transform.forward, tgt.transform.forward) > 0.25f &&
+                                      dist < boosterDist * 2.5f);
     }
 }

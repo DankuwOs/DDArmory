@@ -1,13 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using DDArmory.Weapons.Utils;
 using ModLoader.Framework;
 using ModLoader.Framework.Attributes;
 using UnityEngine;
 
-namespace DDArmory
+namespace DDArmory.Mainer
 {
     [ItemId("danku-ddarmory")]
     public class Main : VtolMod
     {
+        private void Awake()
+        {
+        }
+
         /*public void Awake()
         {
             Debug.Log($"[DDA]: Waiting for me to be loaded...");

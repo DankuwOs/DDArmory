@@ -12,7 +12,6 @@ public class Patch_HUDGDS
         if (__instance.weapon is not IGunAimpointOnly) return;
         
         __instance.targetLocked = false; // Skips all of the code that makes the pipper hud thing do the thing idk.
-        Debug.Log($"[DDA]: gun gun is aimpoint only, setting target locked to false yippee");
     }
     
     public static void Postfix(HUDGunDirectorSight __instance)

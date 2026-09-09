@@ -3,7 +3,7 @@
 namespace DDArmory.Patches;
 
 // Token: 0x02000011 RID: 17
-[HarmonyPatch(typeof(Hitbox), "Damage")]
+[HarmonyPatch(typeof(Hitbox), nameof(Hitbox.Damage))]
 public class Patch_Health_Damage
 {
     // Token: 0x0600004C RID: 76 RVA: 0x00003A8C File Offset: 0x00001C8C
